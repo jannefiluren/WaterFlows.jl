@@ -1,28 +1,28 @@
 
 
 """ Single model run for calibration. """
-function calib_wrapper(param, model::AbstractModel, input::AbstractInput, q_obs, warmup)
+function calib_wrapper(param, model::AbstractModel, input::AbstractInput, var_obs, warmup)
 
-    @assert 1 <= warmup <= length(q_obs)
+    @assert 1 <= warmup <= length(var_obs)
 
     set_params!(model, param)
 
     init_states!(model)
 
-    q_sim = run_model(model, input)
+    var_sim = run_model(model, input)
 
-    1.0 - nse(q_sim[warmup:end], q_obs[warmup:end])
+    1.0 - nse(var_sim[warmup:end], var_obs[warmup:end])
 
 end
 
 
 """ Run model calibration. """
-function run_model_calib(model::AbstractModel, input::AbstractInput, q_obs;
+function run_model_calib(model::AbstractModel, input::AbstractInput, var_obs;
                          verbose = :silent, warmup = 3*365)
 
     param_range = get_param_ranges(model)
 
-    calib_wrapper_tmp(param) = calib_wrapper(param, model, input, q_obs, warmup)
+    calib_wrapper_tmp(param) = calib_wrapper(param, model, input, var_obs, warmup)
 
     res = bboptimize(calib_wrapper_tmp; SearchRange = param_range, TraceMode = verbose)
 
@@ -32,14 +32,14 @@ end
 
 
 """ Compute Nash-Sutcliffe efficiency. """
-function nse(q_sim, q_obs)
+function nse(var_sim, var_obs)
 
-    ikeep = .!isnan.(q_obs)
+    ikeep = .!isnan.(var_obs)
     
-    q_sim = q_sim[ikeep]
-    q_obs = q_obs[ikeep]
+    var_sim = var_sim[ikeep]
+    var_obs = var_obs[ikeep]
     
-    1.0 - sum((q_sim - q_obs).^2) / sum((q_obs - mean(q_obs)).^2)
+    1.0 - sum((var_sim - var_obs).^2) / sum((var_obs - mean(var_obs)).^2)
 
 end
 

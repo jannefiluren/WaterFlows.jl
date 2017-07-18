@@ -14,8 +14,8 @@ abstract type AbstractInput end
 
 
 export AbstractModel, AbstractSnow, AbstractHydro, AbstractInput
-export SemiDistModel
-export InputPTE
+export SemiDistModel, SnowDistModel
+export InputPTE, InputPT
 export Gr4j
 export TinBasic
 
@@ -32,6 +32,7 @@ include("inputs.jl")
 include("components/gr4j.jl")
 include("components/tinbasic.jl")
 include("models/semidist.jl")
+include("models/snowdist.jl")
 include("utils_data.jl")
 include("utils_epot.jl")
 include("utils_calib.jl")
