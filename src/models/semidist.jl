@@ -1,6 +1,6 @@
 
 
-
+# Semidistributed model with snow and hydrological component
 
 mutable struct SemiDistModel{s<:AbstractSnow, h<:AbstractHydro} <: AbstractModel
     
@@ -8,8 +8,6 @@ mutable struct SemiDistModel{s<:AbstractSnow, h<:AbstractHydro} <: AbstractModel
     hydro::h
     
 end
-
-
 
 function run_model(model::SemiDistModel, input::InputPTE)
 
@@ -39,7 +37,6 @@ function run_model(model::SemiDistModel, input::InputPTE)
 
 end
 
-
 function set_input(snow::AbstractSnow, input::InputPTE, t::Int64)
 
     for reg in eachindex(snow.frac)
@@ -51,7 +48,6 @@ function set_input(snow::AbstractSnow, input::InputPTE, t::Int64)
     
 end
 
-
 function set_input(hydro::AbstractHydro, snow::AbstractSnow, input::InputPTE, t::Int64)
 
     hydro.epot = input.epot[t]
@@ -61,4 +57,48 @@ function set_input(hydro::AbstractHydro, snow::AbstractSnow, input::InputPTE, t:
         hydro.p_in += snow.frac[reg] * snow.q_out[reg]
     end
     
+end
+
+
+# Semidistributed model with full model
+
+mutable struct FullModel{h<:HbvLight} <: AbstractModel
+    
+    hydro::h
+    
+end
+
+function run_model(model::FullModel, input::InputPTE)
+
+    nstep = size(input.prec, 2)
+
+    q_out = zeros(nstep)
+
+    for t in 1:nstep
+
+        # Run full model
+
+        set_input(model.hydro, input, t)
+
+        run_timestep(model.hydro)
+
+        q_out[t] = model.hydro.q_out
+
+    end
+
+    return q_out
+
+end
+
+function set_input(model::HbvLight, input::InputPTE, t::Int64)
+
+    for reg in 1:size(model.area,2)
+
+        model.tair[reg] = input.tair[reg, t]
+        model.p_in[reg] = input.prec[reg, t]
+
+    end
+    
+    model.epot = input.epot[t]
+
 end
