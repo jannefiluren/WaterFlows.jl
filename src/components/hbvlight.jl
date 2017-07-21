@@ -4,7 +4,7 @@ using Distributions
 
 # Hydrological component
 
-mutable struct HbvLight <: AbstractModel
+mutable struct HbvLight
     
     state_SP::Array{Float64,2}
     state_WC::Array{Float64,2}

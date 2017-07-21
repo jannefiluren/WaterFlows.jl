@@ -2,14 +2,14 @@
 
 # Semidistributed model with snow and hydrological component
 
-mutable struct SemiDistModel{s<:AbstractSnow, h<:AbstractHydro} <: AbstractModel
+mutable struct SemiDistComp{s <: AbstractSnow, h <: AbstractHydro} <: AbstractModel
     
     snow::s
     hydro::h
     
 end
 
-function run_model(model::SemiDistModel, input::InputPTE)
+function run_model(model::SemiDistComp, input::InputPTE)
 
     nstep = size(input.prec, 2)
 
@@ -62,13 +62,13 @@ end
 
 # Semidistributed model with full model
 
-mutable struct FullModel{h<:HbvLight} <: AbstractModel
+mutable struct SemiDistFull{h<:HbvLight} <: AbstractModel
     
     hydro::h
     
 end
 
-function run_model(model::FullModel, input::InputPTE)
+function run_model(model::SemiDistFull, input::InputPTE)
 
     nstep = size(input.prec, 2)
 

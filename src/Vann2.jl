@@ -11,12 +11,11 @@ abstract type AbstractSnow end
 abstract type AbstractHydro end
 abstract type AbstractInput end
 
-
-
-export AbstractModel, AbstractSnow, AbstractHydro, AbstractInput
-export SemiDistModel, SnowDistModel, FullModel
+export SemiDistComp, SemiDistFull
+export SnowDistModel
 export InputPTE, InputPT
-export Gr4j, Hbv, HbvLight
+export Gr4j, Hbv
+export HbvLight
 export TinBasic
 
 export run_timestep, run_model
@@ -26,7 +25,6 @@ export epot_zero
 export init_states!
 export run_model_calib
 export get_params
-
 
 include("inputs.jl")
 include("components/gr4j.jl")

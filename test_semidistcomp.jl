@@ -1,5 +1,8 @@
 
+# Load packages
+
 using Vann2
+
 
 # Input data
 
@@ -17,7 +20,31 @@ epot = epot_zero(date)
 
 input = InputPTE(prec, tair, epot)
 
-# Setup model
+
+# Test SemiDistComp
+
+tstep = 24.0
+
+time = date[1]
+
+snow = TinBasic(tstep, time, frac)
+
+hydro = Hbv(tstep, time)
+
+model = SemiDistComp(snow, hydro)
+
+q_sim = run_model(model, input)
+
+param_init = get_params(model)
+
+param_out = run_model_calib(model, input, q_sim, warmup = 1, verbose = :verbose)
+
+println(param_init)
+
+println(param_out)
+
+
+# Test SemiDistFull
 
 tstep = 24.0
 
@@ -29,15 +56,14 @@ area = reshape(frac, 1, length(frac))
 
 hydro = HbvLight(tstep, time, area, lake)
 
-model = FullModel(hydro)
-
-# Run model
+model = SemiDistFull(hydro)
 
 q_sim = run_model(model, input)
 
-# Run calibration
-
 param_init = get_params(model)
 
-run_model_calib(model, input, q_sim, warmup = 1, verbose = :verbose)
+param_out = run_model_calib(model, input, q_sim, warmup = 1, verbose = :verbose)
 
+println(param_init)
+
+println(param_out)
