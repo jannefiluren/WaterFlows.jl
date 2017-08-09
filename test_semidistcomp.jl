@@ -8,7 +8,7 @@ using Vann2
 
 path = joinpath(Pkg.dir("Vann2"), "data", "atnasjo")
 
-date, tair, prec, q_obs, frac = load_data(path)
+date, tair, prec, q_obs, frac_area, frac_glacier = load_data(path)
 
 date_start = DateTime(2010, 01, 01)
 
@@ -27,11 +27,13 @@ tstep = 24.0
 
 time = date[1]
 
-snow = TinBasic(tstep, time, frac)
+snow = NoSnow(tstep, time, frac_area)
 
-hydro = Hbv(tstep, time)
+glacier = NoGlacier(tstep, time, frac_glacier)
 
-model = SemiDistComp(snow, hydro)
+hydro = Gr4j(tstep, time)
+
+model = SemiDistComp(snow, glacier, hydro)
 
 q_sim = run_model(model, input)
 

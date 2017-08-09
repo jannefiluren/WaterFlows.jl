@@ -76,12 +76,14 @@ function load_data(folder, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
 
   q_obs[q_obs .== -999.0] = NaN
 
-  # Read elevation band data
+  # Read metadata
 
   metadata = CSV.read("$folder/$file_metadata", delim = ";", header = true)
 
   area = convert(Array{Float64,1}, metadata[:area])
-  frac = area / sum(area)
+  frac_area = area / sum(area)
+
+  frac_glacier = convert(Array{Float64,1}, metadata[:lus_glacier]) / 100.0
 
   # Get time data
 
@@ -89,7 +91,7 @@ function load_data(folder, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
 
   # Return data
 
-  return date, tair, prec, q_obs, frac
+  return date, tair, prec, q_obs, frac_area, frac_glacier
 
 end
 

@@ -2,10 +2,9 @@
 
 # Semidistributed model with snow and hydrological component
 
-mutable struct SemiDistComp{s <: AbstractSnow, g <: AbstractGlacier, h <: AbstractHydro} <: AbstractModel
+mutable struct SemiDistComp{s <: AbstractSnow, h <: AbstractHydro} <: AbstractModel
     
     snow::s
-    glacier::g
     hydro::h
     
 end
@@ -24,15 +23,20 @@ function run_model(model::SemiDistComp, input::InputPTE)
 
         run_timestep(model.snow)
 
-        # Run glacier model component
 
-        set_input(model.glacier, input, t)
+
+        # Run glacier component
+
+        set_input(model.glacier, model.snow, input, t)
 
         run_timestep(model.glacier, model.snow)
 
+
+
+
         # Run hydrological component
 
-        set_input(model.hydro, model.snow, model.glacier, input, t)
+        set_input(model.hydro, model.snow, input, t)
 
         run_timestep(model.hydro)
 
@@ -44,34 +48,24 @@ function run_model(model::SemiDistComp, input::InputPTE)
 
 end
 
-function set_input(s::AbstractSnow, input::InputPTE, t::Int64)
+function set_input(snow::AbstractSnow, input::InputPTE, t::Int64)
 
-    for reg in eachindex(s.frac)
+    for reg in eachindex(snow.frac)
 
-        s.tair[reg] = input.tair[reg, t]
-        s.p_in[reg] = input.prec[reg, t]
-
-    end
-    
-end
-
-function set_input(g::AbstractGlacier, input::InputPTE, t::Int64)
-
-    for reg in eachindex(g.frac)
-
-        g.tair[reg] = input.tair[reg, t]
+        snow.tair[reg] = input.tair[reg, t]
+        snow.p_in[reg] = input.prec[reg, t]
 
     end
     
 end
 
-function set_input(h::AbstractHydro, s::AbstractSnow, g::AbstractGlacier, input::InputPTE, t::Int64)
+function set_input(hydro::AbstractHydro, snow::AbstractSnow, input::InputPTE, t::Int64)
 
-    h.epot = input.epot[t]
-    h.p_in = 0.0
+    hydro.epot = input.epot[t]
+    hydro.p_in = 0.0
 
-    for reg in eachindex(s.frac)
-        h.p_in += s.frac[reg] * s.q_out[reg] + g.frac[reg] * g.q_out[reg]
+    for reg in eachindex(snow.frac)
+        hydro.p_in += snow.frac[reg] * snow.q_out[reg]
     end
     
 end
