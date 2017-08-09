@@ -23,11 +23,15 @@ input = InputPTE(prec, tair, epot)
 
 # Test SemiDistComp
 
+frac = [frac_area frac_glacier]'
+
 tstep = 24.0
 
 time = date[1]
 
-snow = NoSnow(tstep, time, frac_area)
+lus = ["open"; "glacier"]
+
+snow = TinBasic(tstep, time, frac, lus)
 
 glacier = NoGlacier(tstep, time, frac_glacier)
 
