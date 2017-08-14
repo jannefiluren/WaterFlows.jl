@@ -6,9 +6,9 @@ using Vann2
 
 # Input data
 
-path = joinpath(Pkg.dir("Vann2"), "data", "atnasjo")
+path = joinpath(Pkg.dir("Vann2"), "data", "fetvatn")
 
-date, tair, prec, q_obs, frac_area, frac_glacier = load_data(path)
+date, tair, prec, q_obs, metadata = load_data(path)
 
 date_start = DateTime(2010, 01, 01)
 
@@ -23,17 +23,13 @@ input = InputPTE(prec, tair, epot)
 
 # Test SemiDistComp
 
-frac = [frac_area frac_glacier]'
-
 tstep = 24.0
 
 time = date[1]
 
-lus = ["open"; "glacier"]
+snow = TinBasic(tstep, time, metadata)
 
-snow = TinBasic(tstep, time, frac, lus)
-
-glacier = NoGlacier(tstep, time, frac_glacier)
+glacier = NoGlacier(tstep, time, metadata)
 
 hydro = Gr4j(tstep, time)
 

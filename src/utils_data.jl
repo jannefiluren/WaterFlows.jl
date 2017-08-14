@@ -1,29 +1,29 @@
 # Load data from text files
 
-#=function load_data(folder, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
+#=function load_data(path, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
                    file_prec = "Prec.txt", file_frac = "Frac.txt")
 
   # Read air temperature data
 
-  str   = readline("$folder/$file_tair")
+  str   = readline("$path/$file_tair")
   nsep  = length(matchall(r";", str))
-  tmp   = CSV.read("$folder/$file_tair", delim = ";", header = false,
+  tmp   = CSV.read("$path/$file_tair", delim = ";", header = false,
                    dateformat="yyyy-mm-dd HH:MM", nullable = false, types = vcat(DateTime, repmat([Float64], nsep)))
   tair  = Array(tmp[:, 2:end])
   tair  = transpose(tair)
 
   # Read precipitation data
 
-  str   = readline("$folder/$file_tair")
+  str   = readline("$path/$file_tair")
   nsep  = length(matchall(r";", str))
-  tmp   = CSV.read("$folder/$file_prec", delim = ";", header = false,
+  tmp   = CSV.read("$path/$file_prec", delim = ";", header = false,
                   dateformat="yyyy-mm-dd HH:MM", nullable = false, types = vcat(DateTime, repmat([Float64], nsep)))
   prec  = Array(tmp[:, 2:end])
   prec  = transpose(prec)
 
   # Read runoff data
 
-  tmp   = CSV.read("$folder/$file_q_obs", delim = ";", header = false,
+  tmp   = CSV.read("$path/$file_q_obs", delim = ";", header = false,
                    dateformat="yyyy-mm-dd HH:MM", nullable = false, types = [DateTime, Float64])
   q_obs = Array(tmp[:, 2])
 
@@ -31,7 +31,7 @@
 
   # Read elevation band data
 
-  frac = readdlm("$folder/$file_frac")
+  frac = readdlm("$path/$file_frac")
   frac = squeeze(frac,2)
 
   # Get time data
@@ -47,30 +47,30 @@ end=#
 
 # Load operational data from text files
 
-function load_data(folder, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
+function load_data(path, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
                    file_prec = "Prec.txt", file_metadata = "metadata.txt")
 
   # Read air temperature data
 
-  str   = readline("$folder/$file_tair")
+  str   = readline("$path/$file_tair")
   nsep  = length(matchall(r";", str))
-  tmp   = CSV.read("$folder/$file_tair", delim = ";", header = false,
+  tmp   = CSV.read("$path/$file_tair", delim = ";", header = false,
                    dateformat="yyyy-mm-dd HH:MM", nullable = false, types = vcat(DateTime, repmat([Float64], nsep)))
   tair  = Array(tmp[:, 2:end])
   tair  = transpose(tair)
 
   # Read precipitation data
 
-  str   = readline("$folder/$file_tair")
+  str   = readline("$path/$file_tair")
   nsep  = length(matchall(r";", str))
-  tmp   = CSV.read("$folder/$file_prec", delim = ";", header = false,
+  tmp   = CSV.read("$path/$file_prec", delim = ";", header = false,
                   dateformat="yyyy-mm-dd HH:MM", nullable = false, types = vcat(DateTime, repmat([Float64], nsep)))
   prec  = Array(tmp[:, 2:end])
   prec  = transpose(prec)
 
   # Read runoff data
 
-  tmp   = CSV.read("$folder/$file_q_obs", delim = ";", header = false,
+  tmp   = CSV.read("$path/$file_q_obs", delim = ";", header = false,
                    dateformat="yyyy-mm-dd HH:MM", nullable = false, types = [DateTime, Float64])
   q_obs = Array(tmp[:, 2])
 
@@ -78,12 +78,16 @@ function load_data(folder, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
 
   # Read metadata
 
-  metadata = CSV.read("$folder/$file_metadata", delim = ";", header = true)
+  df_tmp = CSV.read("$path/$file_metadata", delim = ";", header = true)
 
-  area = convert(Array{Float64,1}, metadata[:area])
+  area = convert(Array{Float64,1}, df_tmp[:area])
   frac_area = area / sum(area)
 
-  frac_glacier = convert(Array{Float64,1}, metadata[:lus_glacier]) / 100.0
+  frac_glacier = convert(Array{Float64,1}, df_tmp[:lus_glacier]) / 100.0
+
+  metadata = DataFrame()
+  metadata[:glacier] = frac_area .* frac_glacier
+  metadata[:open] = frac_area - metadata[:glacier]
 
   # Get time data
 
@@ -91,7 +95,7 @@ function load_data(folder, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
 
   # Return data
 
-  return date, tair, prec, q_obs, frac_area, frac_glacier
+  return date, tair, prec, q_obs, metadata
 
 end
 

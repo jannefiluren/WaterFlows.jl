@@ -3,6 +3,7 @@ module Vann2
 using BlackBoxOptim
 using CSV
 using Distributions
+using DataFrames
 
 # Abstract types
 

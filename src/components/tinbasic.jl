@@ -10,14 +10,16 @@ mutable struct TinBasic <: AbstractSnow
     tair::Array{Float64,1}
     q_out::Array{Float64,2}
     frac::Array{Float64,2}
-    lus::Array{String,1}
     tstep::Float64
     time::DateTime
     
 end
 
 
-function TinBasic(tstep::Float64, time::DateTime, frac::Array{Float64,2}, lus::Array{String,1})
+function TinBasic(tstep::Float64, time::DateTime, metadata::DataFrame)
+
+    frac = convert(Array{Float64,2}, metadata)
+    frac = transpose(frac)
     
     swe   = zeros(Float64, size(frac))
     p_in  = zeros(Float64, size(frac,2))
@@ -28,7 +30,7 @@ function TinBasic(tstep::Float64, time::DateTime, frac::Array{Float64,2}, lus::A
     ddf = 3.69
     pcorr = 1.02
     
-    TinBasic(swe, tth, ddf, pcorr, p_in, tair, q_out, frac, lus, tstep, time)
+    TinBasic(swe, tth, ddf, pcorr, p_in, tair, q_out, frac, tstep, time)
     
 end
 
@@ -43,11 +45,9 @@ end
 
 
 function init_states!(model::TinBasic)
-    
-    for ilus in 1:size(model.frac, 1)
-        for ireg in 1:size(model.frac, 2)
-            model.swe[ilus, ireg] = 0.0
-        end
+
+    for i in eachindex(model.swe)
+        model.swe[i] = 0.0
     end
     
 end
