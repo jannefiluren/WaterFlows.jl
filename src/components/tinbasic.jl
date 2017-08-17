@@ -1,6 +1,6 @@
 # Snow component
 
-mutable struct TinBasic <: AbstractSnow
+mutable struct TinSnow <: AbstractSnow
     
     swe::Array{Float64,2}
     tth::Float64
@@ -16,7 +16,7 @@ mutable struct TinBasic <: AbstractSnow
 end
 
 
-function TinBasic(tstep::Float64, time::DateTime, metadata::DataFrame)
+function TinSnow(tstep::Float64, time::DateTime, metadata::DataFrame)
 
     frac = convert(Array{Float64,2}, metadata)
     frac = transpose(frac)
@@ -30,12 +30,12 @@ function TinBasic(tstep::Float64, time::DateTime, metadata::DataFrame)
     ddf = 3.69
     pcorr = 1.02
     
-    TinBasic(swe, tth, ddf, pcorr, p_in, tair, q_out, frac, tstep, time)
+    TinSnow(swe, tth, ddf, pcorr, p_in, tair, q_out, frac, tstep, time)
     
 end
 
 
-function get_param_ranges(model::TinBasic)
+function get_param_ranges(model::TinSnow)
     
     param_range = Dict(:tth => (-3.0, 3.0),
     :ddf => (0.1, 10.0),
@@ -44,7 +44,7 @@ function get_param_ranges(model::TinBasic)
 end
 
 
-function init_states!(model::TinBasic)
+function init_states!(model::TinSnow)
 
     for i in eachindex(model.swe)
         model.swe[i] = 0.0
@@ -53,7 +53,7 @@ function init_states!(model::TinBasic)
 end
 
 
-function run_timestep(m::TinBasic)
+function run_timestep(m::TinSnow)
     
     for ireg in 1:size(m.frac, 2)
 
@@ -91,23 +91,5 @@ function run_timestep(m::TinBasic)
     
 end
 
-@inline function split_prec(prec, tair, tth_phase = 0.0; m_phase = 0.5)
-    
-    frac_snowfall = 1. / (1. + exp( (tair - tth_phase) / m_phase ))
-    
-    psolid = prec * frac_snowfall
-    pliquid = prec - psolid
-    
-    return psolid, pliquid
-    
-end
 
-@inline function pot_melt(tair, ddf = 3.0, tth_melt = 0.0; m_melt = 0.5)
-    
-    t_m = (tair - tth_melt) / m_melt
-    pot_melt = ddf * m_melt * (t_m + log(1. + exp(-t_m)))
-    
-    return pot_melt
-    
-end
 

@@ -18,8 +18,8 @@ export SnowDistModel
 export InputPTE, InputPT
 export Gr4j, Hbv
 export HbvLight
-export TinBasic, NoSnow
-export NoGlacier
+export TinSnow, NoSnow
+export TinGlacier, NoGlacier
 
 export run_timestep, run_model
 export load_data, crop_data
@@ -33,13 +33,16 @@ include("inputs.jl")
 include("components/gr4j.jl")
 include("components/hbv.jl")
 include("components/hbvlight.jl")
-include("components/tinbasic.jl")
+include("components/tinsnow.jl")
 include("components/nosnow.jl")
+include("components/tinglacier.jl")
 include("components/noglacier.jl")
 include("models/semidist.jl")
 include("models/snowdist.jl")
+include("utils_snow.jl")
+include("solar_rad.jl")
 include("utils_data.jl")
-include("utils_epot.jl")
+include("pot_evap.jl")
 include("utils_calib.jl")
 
 end

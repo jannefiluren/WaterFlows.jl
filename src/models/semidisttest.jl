@@ -23,16 +23,11 @@ function run_model(model::SemiDistComp, input::InputPTE)
 
         run_timestep(model.snow)
 
-
-
         # Run glacier component
 
         set_input(model.glacier, model.snow, input, t)
 
         run_timestep(model.glacier, model.snow)
-
-
-
 
         # Run hydrological component
 
