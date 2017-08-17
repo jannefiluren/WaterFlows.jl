@@ -46,11 +46,9 @@ end
 
 function set_input(s::AbstractSnow, input::InputPTE, t::Int64)
 
-    for reg in eachindex(s.frac)
-
+    for reg in 1:size(s.frac, 2)
         s.tair[reg] = input.tair[reg, t]
         s.p_in[reg] = input.prec[reg, t]
-
     end
     
 end
@@ -58,9 +56,7 @@ end
 function set_input(g::AbstractGlacier, input::InputPTE, t::Int64)
 
     for reg in eachindex(g.frac)
-
         g.tair[reg] = input.tair[reg, t]
-
     end
     
 end
@@ -68,10 +64,15 @@ end
 function set_input(h::AbstractHydro, s::AbstractSnow, g::AbstractGlacier, input::InputPTE, t::Int64)
 
     h.epot = input.epot[t]
+    
     h.p_in = 0.0
 
     for reg in eachindex(s.frac)
-        h.p_in += s.frac[reg] * s.q_out[reg] + g.frac[reg] * g.q_out[reg]
+        h.p_in += s.frac[reg] * s.q_out[reg]
+    end
+    
+    for reg in eachindex(g.frac)
+        h.p_in += g.frac[reg] * g.q_out[reg]
     end
     
 end

@@ -5,18 +5,25 @@ mutable struct NoGlacier <: AbstractGlacier
     tair::Array{Float64,1}
     q_out::Array{Float64,1}
     frac::Array{Float64,1}
+    iglacier::Int64
     tstep::Float64
     time::DateTime
     
 end
 
 
-function NoGlacier(tstep::Float64, time::DateTime, frac::Array{Float64,1})
+function NoGlacier(tstep::Float64, time::DateTime, metadata::DataFrame)
+
+    iglacier = find(names(metadata) .== :glacier)
+    iglacier = iglacier[1]
+
+    frac = convert(Array{Float64,2}, metadata)
+    frac = frac[:, iglacier]
     
     tair  = zeros(Float64, length(frac))
     q_out = zeros(Float64, length(frac))
     
-    NoGlacier(tair, q_out, frac, tstep, time)
+    NoGlacier(tair, q_out, frac, iglacier, tstep, time)
     
 end
 

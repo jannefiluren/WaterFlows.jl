@@ -2,13 +2,13 @@
 # Load packages
 
 using Vann2
-
+using DataFrames
 
 # Input data
 
 path = joinpath(Pkg.dir("Vann2"), "data", "atnasjo")
 
-date, tair, prec, q_obs, frac_area, frac_glacier = load_data(path)
+date, tair, prec, q_obs, metadata = load_data(path)
 
 date_start = DateTime(2010, 01, 01)
 
@@ -16,7 +16,11 @@ date_stop = DateTime(2015, 01, 01)
 
 date, tair, prec, q_obs = crop_data(date, tair, prec, q_obs, date_start, date_stop)
 
-epot = epot_zero(date)
+frac_area = [sum(convert(Array, row)) for row in eachrow(metadata)]
+
+lat = 70.0
+
+epot = oudin(date, tair, lat, frac_area)
 
 input = InputPTE(prec, tair, epot)
 
@@ -27,9 +31,9 @@ tstep = 24.0
 
 time = date[1]
 
-snow = NoSnow(tstep, time, frac_area)
+snow = TinSnow(tstep, time, metadata)
 
-glacier = NoGlacier(tstep, time, frac_glacier)
+glacier = TinGlacier(tstep, time, metadata)
 
 hydro = Gr4j(tstep, time)
 
@@ -41,9 +45,9 @@ param_init = get_params(model)
 
 param_out = run_model_calib(model, input, q_sim, warmup = 1, verbose = :verbose)
 
-println(param_init)
+println(round.(param_init,2))
 
-println(param_out)
+println(round.(param_out,2))
 
 
 # Test SemiDistFull

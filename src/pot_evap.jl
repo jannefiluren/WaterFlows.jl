@@ -1,7 +1,11 @@
 
 
 
-"""Potential evapotranspiration using Oudins formula (mm/day)."""
+"""
+Catchment average potential evapotranspiration using Oudins formula (mm/day) 
+from date, air temperature (°C), latitude (°) and fraction of each computational
+element (unitless).
+"""
 function oudin(date::Array{DateTime,1}, tair::Array{Float64,2}, lat::Float64, frac_area::Array{Float64,1})
 
     pet = similar(tair)
@@ -17,7 +21,10 @@ function oudin(date::Array{DateTime,1}, tair::Array{Float64,2}, lat::Float64, fr
 end
 
 
-"""Potential evapotranspiration using Oudins formula (mm day-1)."""
+"""
+Potential evapotranspiration using Oudins formula (mm day-1) from date, 
+air temperature (°C) and latitude (°).
+"""
 function oudin(date::Array{DateTime,1}, tair::Array{Float64,1}, lat::Float64)
 
     oudin_tmp(tair, date) = oudin(tair, date, lat)
@@ -27,7 +34,10 @@ function oudin(date::Array{DateTime,1}, tair::Array{Float64,1}, lat::Float64)
 end
 
 
-"""Potential evapotranspiration using Oudins formula (mm day-1)."""
+"""
+Potential evapotranspiration using Oudins formula (mm day-1) from date, 
+air temperature (°C) and latitude (°).
+"""
 function oudin(tair::Float64, date::DateTime, lat::Float64)
 
     # Convert date to day-of-year
@@ -99,7 +109,9 @@ function oudin(tair::Float64, date::DateTime, lat::Float64)
 end
 
 
-"""Potential evapotranspiration using Hamons formula (mm/day)."""
+"""
+Potential evapotranspiration using Hamons formula (mm/day).
+"""
 function hamon(date::Array{DateTime,1}, tair::Array{Float64,2}, lat::Float64, frac_area::Array{Float64,1})
 
     pet = similar(tair)
@@ -115,41 +127,51 @@ function hamon(date::Array{DateTime,1}, tair::Array{Float64,2}, lat::Float64, fr
 end
 
 
-"""Potential evapotranspiration using Hamons formula (mm/day)."""
+"""
+Potential evapotranspiration using Hamons formula (mm/day).
+"""
 function hamon(date::Array{DateTime,1}, tair::Array{Float64,1}, lat::Float64)
 
     # Compute monthly average temperature
 
     tair = monthly_mean(date, tair)
 
-    # Compute monthly average day length
+    # Compute monthly average daylight hours
 
-    day_length_tmp(date) = day_length(date, lat)
+    lat = deg2rad(lat)
 
-    ld = map(day_length_tmp, date)
+    doy = Dates.dayofyear.(date)
+
+    δ = solar_decl.(doy)
+
+    ω_s = sunset_hour_angle.(lat, δ)
+
+    ld = daylight_hours.(ω_s)
 
     ld = monthly_mean(date, ld)
 
     # Compute saturation vapor density
 
-    esat = map(sat_vap_pressure, tair)
+    esat = sat_vap_pressure.(tair)
 
     # Compute potential evapotranspiration
 
-    pet = map(hamon, tair, esat, ld)
+    pet = hamon.(tair, esat, ld)
 
 end
 
 
-"""Potential evapotranspiration using Hamons formula (mm/day)."""
+"""
+Potential evapotranspiration using Hamons formula (mm/day).
+"""
 function hamon(tair::Float64, esat::Float64, ld::Float64)
-
     pet = 29.8 * ld * esat / (tair + 273.2)
-
 end
 
 
-"""Compute monthly averages."""
+"""
+Compute monthly averages.
+"""
 function monthly_mean(date, values)
 
     months = map(Dates.month, date)
@@ -167,121 +189,32 @@ function monthly_mean(date, values)
 end
 
 
-"""Saturated vapor pressure (kPa)"""
+"""
+Saturation vapor pressure (kPa) air temperature (°C).
+"""
 function sat_vap_pressure(tair)
-    
-    esat = 0.6108*exp(17.27*tair / (tair+237.3))
-    
-end
-
-
-"""Solar declination."""
-function solar_decl(doy)
-    
-    0.409 * sin(2π/365.0*doy - 1.39)
-
-end
-
-
-"""Sunset hour angle."""
-function sunset_hour_angle(lat, δ)
-
-    tmp = -tan(δ)*tan(lat)
-
-    tmp = tmp > 1.0 ? 1.0 : tmp
-    tmp = tmp < -1.0 ? -1.0 : tmp
-    
-    acos(tmp)
-
-end
-
-
-"""Day length (hours)"""
-function day_length(date, lat)
-    
-    # Compute day of year
-    
-    doy = Dates.dayofyear(date)
-    
-    # Declination
-    
-    δ = solar_decl(doy)
-    
-    # Sunset hour angle
-    
-    ω = sunset_hour_angle(lat, δ)
-    
-    # Day length
-    
-    (24.0/π)*ω
-    
-end
-
-
-"""Extraterrestrial radiation (MJ m-2 day-1)"""
-function extra_ter_rad(date, lat)
-
-    # Compute day of year
-    
-    doy = Dates.dayofyear(date)
-
-    # Declination
-    
-    δ = solar_decl(doy)
-    
-    # Sunset hour angle
-    
-    ω = sunset_hour_angle(lat, δ)
-
-    # Inverse relative distance earth to sun
-
-    dr = 1 + 0.033cos(2π/365.0*doy)
-
-    # Extraterrestrial radiation
-
-    1440/π*0.082*dr*(ω*sin(lat)*sin(δ) + cos(lat)*cos(δ)*sin(ω))
-
+    esat = 0.6108*exp(17.27*tair/(tair+237.3))
 end
 
 
 """
-    epot_monthly(datevec)
-
-Use montly average values for potential evapotranspiration.
-See report "The nordic HBV model" by Nils Roar Saelthun.
+Monthly average potential evapotranspiration from date (see 
+report "The nordic HBV model" by Nils Roar Saelthun.)
 """
-function epot_monthly(datevec)
-
-    # Monthly values of potential evapotranspiration (mm/day)
-
+function epot_monthly(date)
     epot_month = [0.7, 0.7, 0.7, 1.0, 1.3, 1.4, 1.3, 1.1, 1.0, 0.9, 0.7, 0.7]
-
-    # Assign montly values to days
-
-    epot = zeros(Float64, length(datevec))
-
-    for i in eachindex(datevec)
-
-        imonth = Dates.month(datevec[i])
-
+    epot = zeros(Float64, length(date))
+    for i in eachindex(date)
+        imonth = Dates.month(date[i])
         epot[i] = epot_month[imonth]
-
     end
-
     return(epot)
-
 end
 
 
 """
-    epot_zero(datevec)
-
 Set potential evapotranspiration to zero.
 """
-function epot_zero(datevec)
-
-    epot = zeros(Float64, length(datevec))
-
-    return(epot)
-
+function epot_zero(date)
+    zeros(Float64, length(date))
 end

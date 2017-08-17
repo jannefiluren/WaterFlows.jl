@@ -16,7 +16,7 @@ tstep = 24.0
 
 time = date[1]
 
-snow = TinBasic(tstep, time, frac)
+snow = TinSnow(tstep, time, frac)
 
 model = SnowDistModel(snow)
 
