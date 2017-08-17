@@ -16,9 +16,9 @@ mutable struct TinSnow <: AbstractSnow
 end
 
 
-function TinSnow(tstep::Float64, time::DateTime, metadata::DataFrame)
+function TinSnow(tstep::Float64, time::DateTime, frac_lus::DataFrame)
 
-    frac = convert(Array{Float64,2}, metadata)
+    frac = convert(Array{Float64,2}, frac_lus)
     frac = transpose(frac)
     
     swe   = zeros(Float64, size(frac))

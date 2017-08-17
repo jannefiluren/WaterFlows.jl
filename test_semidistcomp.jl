@@ -6,17 +6,15 @@ using DataFrames
 
 # Input data
 
-path = joinpath(Pkg.dir("Vann2"), "data", "atnasjo")
+path = joinpath(Pkg.dir("Vann2"), "data", "fetvatn")
 
-date, tair, prec, q_obs, metadata = load_data(path)
+date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 
 date_start = DateTime(2010, 01, 01)
 
 date_stop = DateTime(2015, 01, 01)
 
 date, tair, prec, q_obs = crop_data(date, tair, prec, q_obs, date_start, date_stop)
-
-frac_area = [sum(convert(Array, row)) for row in eachrow(metadata)]
 
 lat = 70.0
 
@@ -31,9 +29,9 @@ tstep = 24.0
 
 time = date[1]
 
-snow = TinSnow(tstep, time, metadata)
+snow = TinSnow(tstep, time, frac_lus)
 
-glacier = TinGlacier(tstep, time, metadata)
+glacier = HockGlacier(tstep, time, frac_lus, lat, elev)
 
 hydro = Gr4j(tstep, time)
 
@@ -50,7 +48,64 @@ println(round.(param_init,2))
 println(round.(param_out,2))
 
 
-# Test SemiDistFull
+
+
+
+
+#=
+# Test SemiDistComp
+
+tstep = 24.0
+
+time = date[1]
+
+snow = TinSnow(tstep, time, frac_lus)
+
+glacier = TinGlacier(tstep, time, frac_lus)
+
+hydro = Gr4j(tstep, time)
+
+model = SemiDistComp(snow, glacier, hydro)
+
+q_sim = run_model(model, input)
+
+param_init = get_params(model)
+
+param_out = run_model_calib(model, input, q_sim, warmup = 1, verbose = :verbose)
+
+println(round.(param_init,2))
+
+println(round.(param_out,2))
+=#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#= Test SemiDistFull
 
 tstep = 24.0
 
@@ -72,4 +127,4 @@ param_out = run_model_calib(model, input, q_sim, warmup = 1, verbose = :verbose)
 
 println(param_init)
 
-println(param_out)
+println(param_out)=#

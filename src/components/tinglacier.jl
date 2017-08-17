@@ -13,12 +13,12 @@ mutable struct TinGlacier <: AbstractGlacier
 end
 
 
-function TinGlacier(tstep::Float64, time::DateTime, metadata::DataFrame)
+function TinGlacier(tstep::Float64, time::DateTime, frac_lus::DataFrame)
 
-    iglacier = find(names(metadata) .== :glacier)
+    iglacier = find(names(frac_lus) .== :glacier)
     iglacier = iglacier[1]
 
-    frac = convert(Array{Float64,2}, metadata)
+    frac = convert(Array{Float64,2}, frac_lus)
     frac = frac[:, iglacier]
     
     tair  = zeros(Float64, length(frac))

@@ -85,9 +85,11 @@ function load_data(path, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
 
   frac_glacier = convert(Array{Float64,1}, df_tmp[:lus_glacier]) / 100.0
 
-  metadata = DataFrame()
-  metadata[:glacier] = frac_area .* frac_glacier
-  metadata[:open] = frac_area - metadata[:glacier]
+  frac_lus = DataFrame()
+  frac_lus[:glacier] = frac_area .* frac_glacier
+  frac_lus[:open] = frac_area - frac_lus[:glacier]
+
+  elev = convert(Array{Float64,1}, df_tmp[:elevation])
 
   # Get time data
 
@@ -95,7 +97,7 @@ function load_data(path, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
 
   # Return data
 
-  return date, tair, prec, q_obs, metadata
+  return date, tair, prec, q_obs, frac_lus, frac_area, elev
 
 end
 
