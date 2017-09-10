@@ -18,7 +18,7 @@ export SnowDistModel
 export InputPTE, InputPT
 export Gr4j, Hbv
 export HbvLight
-export TinSnow, NoSnow
+export TinSnow, NoSnow, HbvLightSnow
 export TinGlacier, HockGlacier, NoGlacier
 
 export run_timestep, run_model
@@ -35,6 +35,7 @@ include("components/hbv.jl")
 include("components/hbvlight.jl")
 include("components/nosnow.jl")
 include("components/tinsnow.jl")
+include("components/hbv_light_snow.jl")
 include("components/noglacier.jl")
 include("components/tinglacier.jl")
 include("components/hockglacier.jl")
