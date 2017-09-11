@@ -16,7 +16,7 @@ function NoGlacier(tstep::Float64, time::DateTime, frac_lus::DataFrame)
 
     iglacier = find(names(frac_lus) .== :glacier)
     iglacier = iglacier[1]
-
+    
     frac = convert(Array{Float64,2}, frac_lus)
     frac = frac[:, iglacier]
     

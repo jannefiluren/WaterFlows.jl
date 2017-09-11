@@ -29,11 +29,13 @@ tstep = 24.0
 
 time = date[1]
 
-snow = TinSnow(tstep, time, frac_lus)
+lake = 0.0
+
+snow = HbvLightSnow(tstep, time, frac_lus)
 
 glacier = HockGlacier(tstep, time, frac_lus, lat, elev)
 
-hydro = Gr4j(tstep, time)
+hydro = HbvLightSubsurf(tstep, time, frac_lus, lake)
 
 model = SemiDistComp(snow, glacier, hydro)
 

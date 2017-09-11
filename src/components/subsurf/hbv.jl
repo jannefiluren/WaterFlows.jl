@@ -1,6 +1,6 @@
 # Hydrological component
 
-mutable struct Hbv <: AbstractHydro
+mutable struct Hbv <: AbstractSubsurfLumped
     
     sm::Float64
     suz::Float64

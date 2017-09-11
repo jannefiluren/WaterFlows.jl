@@ -2,7 +2,7 @@
 
 # Semidistributed model with snow and hydrological component
 
-mutable struct SemiDistComp{s <: AbstractSnow, g <: AbstractGlacier, h <: AbstractHydro} <: AbstractModel
+mutable struct SemiDistComp{s <: AbstractSnow, g <: AbstractGlacier, h <: AbstractSubsurf} <: AbstractModel
     
     snow::s
     glacier::g
@@ -30,11 +30,13 @@ function run_model(model::SemiDistComp, input::InputPTE)
 
         run_timestep(model.glacier, model.snow)
 
-        # Run hydrological component
+        # Run subsurface model component
 
         set_input(model.hydro, model.snow, model.glacier, input, t)
 
         run_timestep(model.hydro)
+
+        # Collect runoff as output
 
         q_out[t] = model.hydro.q_out
 
@@ -43,6 +45,9 @@ function run_model(model::SemiDistComp, input::InputPTE)
     return q_out
 
 end
+
+
+# Set input to snow model
 
 function set_input(s::AbstractSnow, input::InputPTE, t::Int64)
 
@@ -53,6 +58,9 @@ function set_input(s::AbstractSnow, input::InputPTE, t::Int64)
     
 end
 
+
+# Set input to glacier model
+
 function set_input(g::AbstractGlacier, input::InputPTE, t::Int64)
 
     for reg in eachindex(g.frac)
@@ -61,7 +69,10 @@ function set_input(g::AbstractGlacier, input::InputPTE, t::Int64)
     
 end
 
-function set_input(h::AbstractHydro, s::AbstractSnow, g::AbstractGlacier, input::InputPTE, t::Int64)
+
+# Set input to lumped subsurface model with glacier
+
+function set_input(h::AbstractSubsurfLumped, s::AbstractSnow, g::AbstractGlacier, input::InputPTE, t::Int64)
 
     h.epot = input.epot[t]
     
@@ -78,6 +89,80 @@ function set_input(h::AbstractHydro, s::AbstractSnow, g::AbstractGlacier, input:
 end
 
 
+# Set input to lumped subsurface model without glacier
+
+function set_input(h::AbstractSubsurfLumped, s::AbstractSnow, g::NoGlacier, input::InputPTE, t::Int64)
+
+    h.epot = input.epot[t]
+    
+    h.p_in = 0.0
+
+    for reg in eachindex(s.frac)
+        h.p_in += s.frac[reg] * s.q_out[reg]
+    end
+    
+end
+
+
+# Set input to distributed subsurface model with glacier
+
+function set_input(h::AbstractSubsurfDist, s::AbstractSnow, g::AbstractGlacier, input::InputPTE, t::Int64)
+
+    h.epot = input.epot[t]
+
+    nveg, nreg = size(h.frac)
+
+    h.p_in .= 0.0
+
+    for iveg = 1:nveg, ireg = 1:nreg
+        h.p_in[iveg, ireg] += s.frac[iveg, ireg] * s.q_out[iveg, ireg]
+    end
+
+    for ireg = 1:nreg
+        h.p_in[g.iglacier, ireg] = g.frac[ireg] * g.q_out[ireg]
+    end
+
+    h.par_TT .= s.par_TT
+    h.par_SFCF .= s.par_SFCF
+
+    return nothing
+
+end
+
+
+# Set input to distributed subsurface model without glacier
+
+function set_input(h::AbstractSubsurfDist, s::AbstractSnow, g::NoGlacier, input::InputPTE, t::Int64)
+    
+    h.epot = input.epot[t]
+
+    nveg, nreg = size(h.frac)
+
+    h.p_in .= 0.0
+
+    for iveg = 1:nveg, ireg = 1:nreg
+        h.p_in[iveg, ireg] += s.frac[iveg, ireg] * s.q_out[iveg, ireg]
+    end
+
+    h.par_TT .= s.par_TT
+    h.par_SFCF .= s.par_SFCF
+
+
+    # input snow / no snow missing
+
+
+    return nothing
+
+end
+
+
+
+
+
+
+
+
+#= 
 # Semidistributed model with full model
 
 mutable struct SemiDistFull{h<:HbvLight} <: AbstractModel
@@ -119,4 +204,4 @@ function set_input(model::HbvLight, input::InputPTE, t::Int64)
     
     model.epot = input.epot[t]
 
-end
+end =#

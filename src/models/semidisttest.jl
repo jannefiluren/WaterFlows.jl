@@ -2,7 +2,7 @@
 
 # Semidistributed model with snow and hydrological component
 
-mutable struct SemiDistComp{s <: AbstractSnow, h <: AbstractHydro} <: AbstractModel
+mutable struct SemiDistComp{s <: AbstractSnow, h <: AbstractSubsurf} <: AbstractModel
     
     snow::s
     hydro::h
@@ -54,7 +54,7 @@ function set_input(snow::AbstractSnow, input::InputPTE, t::Int64)
     
 end
 
-function set_input(hydro::AbstractHydro, snow::AbstractSnow, input::InputPTE, t::Int64)
+function set_input(hydro::AbstractSubsurf, snow::AbstractSnow, input::InputPTE, t::Int64)
 
     hydro.epot = input.epot[t]
     hydro.p_in = 0.0

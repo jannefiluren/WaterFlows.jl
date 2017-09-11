@@ -1,6 +1,6 @@
 # Hydrological component
 
-mutable struct Gr4j <: AbstractHydro
+mutable struct Gr4j <: AbstractSubsurfLumped
     
     st::Array{Float64,1}
     st_uh1::Array{Float64,1}

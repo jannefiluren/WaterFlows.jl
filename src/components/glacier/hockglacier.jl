@@ -37,8 +37,9 @@ end
 
 function get_param_ranges(model::HockGlacier)
     
-    param_range = Dict(:f_m => (0.1, 10.0),
-    :r_ice => (0.1, 2.0))
+    param_range = Dict(
+        :f_m => (0.1, 10.0),
+        :r_ice => (0.1, 2.0))
     
 end
 

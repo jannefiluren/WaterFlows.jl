@@ -4,8 +4,8 @@ mutable struct NoSnow <: AbstractSnow
     
     p_in::Array{Float64,1}
     tair::Array{Float64,1}
-    q_out::Array{Float64,1}
-    frac::Array{Float64,1}
+    q_out::Array{Float64,1}   # This needs to be a 2d array
+    frac::Array{Float64,1}    # This needs to be a 2d array
     tstep::Float64
     time::DateTime
     

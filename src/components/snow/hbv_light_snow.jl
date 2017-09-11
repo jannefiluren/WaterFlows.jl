@@ -1,8 +1,8 @@
 
 
-mutable struct HbvLightSnow
+mutable struct HbvLightSnow <: AbstractSnow
     
-    state_SP::Array{Float64,2}
+    swe::Array{Float64,2}
     state_WC::Array{Float64,2}
 
     par_TT::Array{Float64,1}
@@ -15,7 +15,7 @@ mutable struct HbvLightSnow
     tair::Array{Float64,1}
     q_out::Array{Float64,2}
 
-    area::Array{Float64,2}
+    frac::Array{Float64,2}
     
     tstep::Float64
     time::DateTime
@@ -23,18 +23,21 @@ mutable struct HbvLightSnow
 end
 
 
-function HbvLightSnow(tstep::Float64, time::DateTime, area::Array{Float64,2})
+function HbvLightSnow(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     
     @assert 1.0 <= tstep <= 24.0 "Time step outside allowed range (1.0 - 24.0h)"
-    
-    nveg, nelev = size(area)
 
-    state_SP = zeros(nveg, nelev)
+    frac = convert(Array{Float64,2}, frac_lus)
+    frac = transpose(frac)
+    
+    nveg, nelev = size(frac)
+
+    swe = zeros(nveg, nelev)
     state_WC = zeros(nveg, nelev)
 
-    par_TT = fill(-1.0, nveg)
+    par_TT = fill(0.0, nveg)
     par_CFMAX = fill(5.0, nveg)
-    par_SFCF = fill(0.8, nveg)
+    par_SFCF = fill(1.0, nveg)
     par_CFR = fill(0.05, nveg)
     par_CWH = fill(0.1, nveg)
 
@@ -42,8 +45,8 @@ function HbvLightSnow(tstep::Float64, time::DateTime, area::Array{Float64,2})
     tair = fill(0.0, nelev)
     q_out = fill(0.0, nveg, nelev)
 
-    HbvLightSnow(state_SP, state_WC, par_TT, par_CFMAX, par_SFCF, 
-    par_CFR, par_CWH, p_in, tair, q_out, area, tstep, time)
+    HbvLightSnow(swe, state_WC, par_TT, par_CFMAX, par_SFCF, 
+    par_CFR, par_CWH, p_in, tair, q_out, frac, tstep, time)
 
 end
 
@@ -62,7 +65,7 @@ end
 
 function init_states!(m::HbvLightSnow)
     
-    m.state_SP .= zeros(m.state_SP)
+    m.swe .= zeros(m.swe)
     m.state_WC .= zeros(m.state_WC)
     
 end
@@ -75,9 +78,9 @@ function run_timestep(m::HbvLightSnow)
         P_zone = m.p_in[elevzone]
         T_zone = m.tair[elevzone]
 
-        for vegzone = 1:size(m.area,1)
+        for vegzone = 1:size(m.frac,1)
 
-            SP = m.state_SP[vegzone, elevzone]
+            SP = m.swe[vegzone, elevzone]
             WC = m.state_WC[vegzone, elevzone]
 
             tt    = m.par_TT[vegzone]
@@ -125,6 +128,9 @@ function run_timestep(m::HbvLightSnow)
                     SP = P_zone * SFCF
                 end # if T_zone
             end # if SP
+
+            m.swe[vegzone, elevzone] = SP
+            m.state_WC[vegzone, elevzone] = WC
 
             m.q_out[vegzone, elevzone] = q_out
 
