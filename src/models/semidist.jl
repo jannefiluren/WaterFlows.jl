@@ -70,6 +70,13 @@ function set_input(g::AbstractGlacier, input::InputPTE, t::Int64)
 end
 
 
+function set_input(g::NoGlacier, input::InputPTE, t::Int64)
+
+    return nothing
+
+end
+
+
 # Set input to lumped subsurface model with glacier
 
 function set_input(h::AbstractSubsurfLumped, s::AbstractSnow, g::AbstractGlacier, input::InputPTE, t::Int64)

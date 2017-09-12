@@ -78,6 +78,5 @@ include("components/subsurf/hbv_light_subsurf.jl")
 # Model setups
 
 include("models/semidist.jl")
-include("models/snowdist.jl")
 
 end

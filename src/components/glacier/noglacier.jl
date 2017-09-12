@@ -2,17 +2,17 @@
 
 mutable struct NoGlacier <: AbstractGlacier
     
-    tair::Array{Float64,1}
+    #= tair::Array{Float64,1}
     q_out::Array{Float64,1}
     frac::Array{Float64,1}
     iglacier::Int64
     tstep::Float64
-    time::DateTime
+    time::DateTime =#
     
 end
 
 
-function NoGlacier(tstep::Float64, time::DateTime, frac_lus::DataFrame)
+#= function NoGlacier(tstep::Float64, time::DateTime, frac_lus::DataFrame)
 
     iglacier = find(names(frac_lus) .== :glacier)
     iglacier = iglacier[1]
@@ -25,7 +25,7 @@ function NoGlacier(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     
     NoGlacier(tair, q_out, frac, iglacier, tstep, time)
     
-end
+end =#
 
 
 function get_param_ranges(model::NoGlacier)
@@ -43,6 +43,12 @@ end
 
 
 function run_timestep(m::NoGlacier, s::AbstractSnow)
+
+    return nothing
+
+end
+
+#= function run_timestep(m::NoGlacier, s::AbstractSnow)
     
     for reg in eachindex(m.frac)
         
@@ -55,3 +61,4 @@ function run_timestep(m::NoGlacier, s::AbstractSnow)
     return nothing
     
 end
+ =#
