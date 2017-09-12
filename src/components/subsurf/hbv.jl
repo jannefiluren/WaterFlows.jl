@@ -6,7 +6,7 @@ mutable struct Hbv <: AbstractSubsurfLumped
     suz::Float64
     slz::Float64
     st_uh::Array{Float64,1}
-    hbv_ord::Array{Float64,1}
+    ord_uh::Array{Float64,1}
     fc::Float64
     lp::Float64
     k0::Float64
@@ -40,9 +40,9 @@ function Hbv(tstep::Float64, time::DateTime)
     epot = 0.0
     q_out = 0.0
     
-    hbv_ord = compute_hbv_ord(maxbas)
+    ord_uh = compute_hbv_ord(maxbas)
     
-    Hbv(sm, suz, slz, st_uh, hbv_ord, fc, lp, k0, k1, k2, beta, perc, ulz, maxbas, p_in, epot, q_out, tstep, time)
+    Hbv(sm, suz, slz, st_uh, ord_uh, fc, lp, k0, k1, k2, beta, perc, ulz, maxbas, p_in, epot, q_out, tstep, time)
     
 end
 
@@ -68,7 +68,7 @@ function init_states!(m::Hbv)
     m.suz     = 0.0
     m.slz     = 0.0
     
-    m.hbv_ord = compute_hbv_ord(m.maxbas)
+    m.ord_uh = compute_hbv_ord(m.maxbas)
     
     for i in eachindex(m.st_uh)
         m.st_uh[i] = 0.0
@@ -164,13 +164,13 @@ function run_timestep(m::Hbv)
     
     q_tmp = q_suz + q_slz
     
-    nh = length(m.hbv_ord)
+    nh = length(m.ord_uh)
     
     for k = 1:nh-1
-        m.st_uh[k] = m.st_uh[k+1] + m.hbv_ord[k]*q_tmp
+        m.st_uh[k] = m.st_uh[k+1] + m.ord_uh[k]*q_tmp
     end
     
-    m.st_uh[nh] = m.hbv_ord[nh] * q_tmp
+    m.st_uh[nh] = m.ord_uh[nh] * q_tmp
     
     # Compute total runoff
     
@@ -189,7 +189,7 @@ function compute_hbv_ord(maxbas)
     
     triang = Distributions.TriangularDist(0, maxbas)
     triang_cdf = Distributions.cdf(triang, 0:20)
-    hbv_ord = diff(triang_cdf)
+    ord_uh = diff(triang_cdf)
     
 end
 

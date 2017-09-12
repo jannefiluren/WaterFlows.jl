@@ -35,7 +35,7 @@ snow = HbvLightSnow(tstep, time, frac_lus)
 
 glacier = HockGlacier(tstep, time, frac_lus, lat, elev)
 
-hydro = HbvLightSubsurf(tstep, time, frac_lus, lake)
+hydro = Gr4j(tstep, time)
 
 model = SemiDistComp(snow, glacier, hydro)
 
@@ -45,9 +45,9 @@ param_init = get_params(model)
 
 param_out = run_model_calib(model, input, q_sim, warmup = 1, verbose = :verbose)
 
-println(round.(param_init,2))
+println(round.(param_init,1))
 
-println(round.(param_out,2))
+println(round.(param_out,1))
 
 
 

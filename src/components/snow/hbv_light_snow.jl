@@ -3,20 +3,16 @@
 mutable struct HbvLightSnow <: AbstractSnow
     
     swe::Array{Float64,2}
-    state_WC::Array{Float64,2}
-
-    par_TT::Array{Float64,1}
-    par_CFMAX::Array{Float64,1}
-    par_SFCF::Array{Float64,1}
-    par_CFR::Array{Float64,1}
-    par_CWH::Array{Float64,1}
-
+    whc::Array{Float64,2}
+    tth::Array{Float64,1}
+    ddf::Array{Float64,1}
+    pcorr::Array{Float64,1}
+    pfreeze::Array{Float64,1}
+    pwhc::Array{Float64,1}
     p_in::Array{Float64,1}
     tair::Array{Float64,1}
     q_out::Array{Float64,2}
-
-    frac::Array{Float64,2}
-    
+    frac::Array{Float64,2}    
     tstep::Float64
     time::DateTime
     
@@ -25,28 +21,28 @@ end
 
 function HbvLightSnow(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     
-    @assert 1.0 <= tstep <= 24.0 "Time step outside allowed range (1.0 - 24.0h)"
+    @assert tstep == 24.0 "Time step outside allowed range (24.0h)"
 
     frac = convert(Array{Float64,2}, frac_lus)
     frac = transpose(frac)
     
-    nveg, nelev = size(frac)
+    nlus, nreg = size(frac)
 
-    swe = zeros(nveg, nelev)
-    state_WC = zeros(nveg, nelev)
+    swe = zeros(nlus, nreg)
+    whc = zeros(nlus, nreg)
 
-    par_TT = fill(0.0, nveg)
-    par_CFMAX = fill(5.0, nveg)
-    par_SFCF = fill(1.0, nveg)
-    par_CFR = fill(0.05, nveg)
-    par_CWH = fill(0.1, nveg)
+    tth = fill(0.0, nlus)
+    ddf = fill(5.0, nlus)
+    pcorr = fill(1.0, nlus)
+    pfreeze = fill(0.05, nlus)
+    pwhc = fill(0.1, nlus)
 
-    p_in = fill(0.0, nelev)
-    tair = fill(0.0, nelev)
-    q_out = fill(0.0, nveg, nelev)
+    p_in = fill(0.0, nreg)
+    tair = fill(0.0, nreg)
+    q_out = fill(0.0, nlus, nreg)
 
-    HbvLightSnow(swe, state_WC, par_TT, par_CFMAX, par_SFCF, 
-    par_CFR, par_CWH, p_in, tair, q_out, frac, tstep, time)
+    HbvLightSnow(swe, whc, tth, ddf, pcorr, 
+    pfreeze, pwhc, p_in, tair, q_out, frac, tstep, time)
 
 end
 
@@ -54,11 +50,11 @@ end
 function get_param_ranges(m::HbvLightSnow)
     
     param_range = Dict(
-    :par_TT => (-3.0, 3.0),
-    :par_CFMAX => (1.0, 10.0),
-    :par_SFCF => (0.5 ,2.0),
-    :par_CFR => (0.0 ,0.1),
-    :par_CWH => (0.0 ,0.2))
+    :tth => (-3.0, 3.0),
+    :ddf => (1.0, 10.0),
+    :pcorr => (0.5 ,2.0),
+    :pfreeze => (0.0 ,0.1),
+    :pwhc => (0.0 ,0.2))
     
 end
 
@@ -66,73 +62,73 @@ end
 function init_states!(m::HbvLightSnow)
     
     m.swe .= zeros(m.swe)
-    m.state_WC .= zeros(m.state_WC)
+    m.whc .= zeros(m.whc)
     
 end
 
 
 function run_timestep(m::HbvLightSnow)
 
-    for elevzone in eachindex(m.p_in)
+    for ireg in eachindex(m.p_in)
 
-        P_zone = m.p_in[elevzone]
-        T_zone = m.tair[elevzone]
+        p_in = m.p_in[ireg]
+        tair = m.tair[ireg]
 
-        for vegzone = 1:size(m.frac,1)
+        for ilus = 1:size(m.frac, 1)
 
-            SP = m.swe[vegzone, elevzone]
-            WC = m.state_WC[vegzone, elevzone]
+            swe = m.swe[ilus, ireg]
+            whc = m.whc[ilus, ireg]
 
-            tt    = m.par_TT[vegzone]
-            CFMAX = m.par_CFMAX[vegzone]
-            SFCF  = m.par_SFCF[vegzone]
-            CFR   = m.par_CFR[vegzone]
-            CWH   = m.par_CWH[vegzone]
+            tt      = m.tth[ilus]
+            ddf     = m.ddf[ilus]
+            pcorr   = m.pcorr[ilus]
+            pfreeze = m.pfreeze[ilus]
+            pwhc    = m.pwhc[ilus]
 
             q_out = 0.0
             
-            if SP > 0.0
-                if P_zone > 0.0
-                    if T_zone > tt
-                        WC = WC + P_zone
+            if swe > 0.0
+                if p_in > 0.0
+                    if tair > tt
+                        whc = whc + p_in
                     else
-                        SP = SP + P_zone * SFCF
+                        swe = swe + p_in * pcorr
                     end
-                end # if P_zone
-                if T_zone > tt
-                    melt = CFMAX * (T_zone - tt)
-                    if melt > SP
-                        q_out = SP + WC
-                        WC = 0.0
-                        SP = 0.0
+                end
+                if tair > tt
+                    melt = ddf * (tair - tt)
+                    if melt > swe
+                        q_out = swe + whc
+                        whc = 0.0
+                        swe = 0.0
                     else
-                        SP = SP - melt
-                        WC = WC + melt
-                        if WC >= CWH * SP
-                            q_out = WC - CWH * SP
-                            WC = CWH * SP
+                        swe = swe - melt
+                        whc = whc + melt
+                        if whc >= pwhc * swe
+                            q_out = whc - pwhc * swe
+                            whc = pwhc * swe
                         end
                     end
                 else
-                    refrez = CFR * CFMAX * (tt - T_zone)
-                    if refrez > WC
-                        refrez = WC
+                    refrez = pfreeze * ddf * (tt - tair)
+                    if refrez > whc
+                        refrez = whc
                     end
-                    SP = SP + refrez
-                    WC = WC - refrez
-                end # if T_zone
+                    swe = swe + refrez
+                    whc = whc - refrez
+                end
             else
-                if T_zone > tt
-                    q_out = P_zone
+                if tair > tt
+                    q_out = p_in
                 else
-                    SP = P_zone * SFCF
-                end # if T_zone
-            end # if SP
+                    swe = p_in * pcorr
+                end
+            end
 
-            m.swe[vegzone, elevzone] = SP
-            m.state_WC[vegzone, elevzone] = WC
+            m.swe[ilus, ireg] = swe
+            m.whc[ilus, ireg] = whc
 
-            m.q_out[vegzone, elevzone] = q_out
+            m.q_out[ilus, ireg] = q_out
 
         end
 

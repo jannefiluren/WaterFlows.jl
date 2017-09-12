@@ -110,20 +110,20 @@ function set_input(h::AbstractSubsurfDist, s::AbstractSnow, g::AbstractGlacier, 
 
     h.epot = input.epot[t]
 
-    nveg, nreg = size(h.frac)
+    nlus, nreg = size(h.frac)
 
     h.p_in .= 0.0
 
-    for iveg = 1:nveg, ireg = 1:nreg
-        h.p_in[iveg, ireg] += s.frac[iveg, ireg] * s.q_out[iveg, ireg]
+    for ilus = 1:nlus, ireg = 1:nreg
+        h.p_in[ilus, ireg] += s.frac[ilus, ireg] * s.q_out[ilus, ireg]
     end
 
     for ireg = 1:nreg
         h.p_in[g.iglacier, ireg] = g.frac[ireg] * g.q_out[ireg]
     end
 
-    h.par_TT .= s.par_TT
-    h.par_SFCF .= s.par_SFCF
+    h.tth .= s.tth
+    h.pcorr .= s.pcorr
 
     return nothing
 
@@ -136,16 +136,16 @@ function set_input(h::AbstractSubsurfDist, s::AbstractSnow, g::NoGlacier, input:
     
     h.epot = input.epot[t]
 
-    nveg, nreg = size(h.frac)
+    nlus, nreg = size(h.frac)
 
     h.p_in .= 0.0
 
-    for iveg = 1:nveg, ireg = 1:nreg
-        h.p_in[iveg, ireg] += s.frac[iveg, ireg] * s.q_out[iveg, ireg]
+    for ilus = 1:nlus, ireg = 1:nreg
+        h.p_in[ilus, ireg] += s.frac[ilus, ireg] * s.q_out[ilus, ireg]
     end
 
-    h.par_TT .= s.par_TT
-    h.par_SFCF .= s.par_SFCF
+    h.tth .= s.tth
+    h.pcorr .= s.pcorr
 
 
     # input snow / no snow missing
