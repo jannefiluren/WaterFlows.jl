@@ -112,14 +112,10 @@ function set_input(h::AbstractSubsurfDist, s::AbstractSnow, g::AbstractGlacier, 
 
     nlus, nreg = size(h.frac)
 
-    h.p_in .= 0.0
+    h.p_in .= s.q_out
 
-    for ilus = 1:nlus, ireg = 1:nreg
-        h.p_in[ilus, ireg] += s.frac[ilus, ireg] * s.q_out[ilus, ireg]
-    end
-
-    for ireg = 1:nreg
-        h.p_in[g.iglacier, ireg] = g.frac[ireg] * g.q_out[ireg]
+    for ireg = 1:nreg    # IS THIS CORRECT????
+        h.p_in[g.iglacier, ireg] = g.q_out[ireg]
     end
 
     h.tth .= s.tth
@@ -138,13 +134,8 @@ function set_input(h::AbstractSubsurfDist, s::AbstractSnow, g::NoGlacier, input:
 
     nlus, nreg = size(h.frac)
 
-    h.p_in .= 0.0
-
-    for ilus = 1:nlus, ireg = 1:nreg
-        h.p_in[ilus, ireg] += s.frac[ilus, ireg] * s.q_out[ilus, ireg]
-    end
-
-    h.tth .= s.tth
+    h.p_in  .= s.q_out
+    h.tth   .= s.tth
     h.pcorr .= s.pcorr
 
 
