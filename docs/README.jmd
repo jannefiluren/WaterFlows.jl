@@ -4,72 +4,65 @@
 
 To install the package, use the following command inside the Julia REPL:
 
-````julia
-
-Pkg.clone("https://github.com/jmgnve/Vann2")
-````
-
-
-
+```{julia; eval = false}
+Pkg.clone("https://github.com/jmgnve/Vann2") 
+```
 
 To load the package, use the command:
 
-````julia
+```{julia; results = "hidden"}
 using Vann2
-````
-
-
-
-
+```
 
 ## Input data format
 
 Vann currently reads data in a specific text format (see examples for [Atnasjø](https://github.com/jmgnve/Vann2/tree/master/data/atnasjo) and [Fetvatn](https://github.com/jmgnve/Vann2/tree/master/data/fetvatn)). 
 
-First read the data for one of the example datasets, here Atnasjø:
+First, read the data for one of the example datasets, here Atnasjø:
 
-````julia
+```{julia; results = "hidden"}
 path = joinpath(Pkg.dir("Vann2"), "data", "atnasjo")
 
 date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
-````
-
-
-
-
+```
 
 Second, compute potential evapotranspiration for the catchment:
 
-````julia
+```{julia; results = "hidden"}
 lat = 60.0
 epot = oudin(date, tair, lat, frac_area)
-````
-
-
-
-
+```
 
 Third, create an input object that is required for running the models:
 
-````julia
+```{julia; results = "hidden"}
 input = InputPTE(prec, tair, epot);
-````
-
-
-
-
+```
 
 ## Using a complete model
 
+The most user-friendly metod to run a model, is to use a predefined model structure:
 
+Fix an example...
 
-
+Link to folder with models...
 
 ## Building a model from components
 
+A complete model can be built from existing components:
 
 
 
+
+
+
+
+
+
+```julia
+
+
+```
 
 
 
