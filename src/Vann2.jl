@@ -35,8 +35,8 @@ export Gr4j, Hbv, HbvLightSubsurf
 
 # Model setups
 
-export SemiDistComp, SemiDistFull
-export SnowDistModel
+export ModelComp
+export setup_hbv_light
 
 # Utilities
 
@@ -77,6 +77,7 @@ include("components/subsurf/hbv_light_subsurf.jl")
 
 # Model setups
 
-include("models/semidist.jl")
+include("models/model_components.jl")
+include("models/model_hbv_light.jl")
 
 end

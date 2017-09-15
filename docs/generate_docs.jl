@@ -1,4 +1,3 @@
-
 # Generate package documentation
 
 using Weave

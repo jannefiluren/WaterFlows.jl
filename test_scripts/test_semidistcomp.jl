@@ -10,7 +10,7 @@ using PyPlot
 
 path = joinpath(Pkg.dir("Vann2"), "data", "fetvatn")
 
-date, tair, prec, q_obs, frac_lus, frac_area, elev = loaddata(path)
+date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 
 date_start = DateTime(2010, 01, 01)
 
@@ -25,7 +25,7 @@ epot = oudin(date, tair, lat, frac_area)
 input = InputPTE(prec, tair, epot)
 
 
-# Test SemiDistComp
+# Test model components
 
 tstep = 24.0
 
@@ -39,7 +39,7 @@ glacier = NoGlacier()
 
 hydro = Hbv(tstep, time)
 
-model = SemiDistComp(snow, glacier, hydro)
+model = ModelComp(snow, glacier, hydro)
 
 q_obs = run_model(model, input)
 
