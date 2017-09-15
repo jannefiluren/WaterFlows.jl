@@ -1,19 +1,18 @@
 
-
 # Load packages
 
-using Vann2
+using VannModels
 using PyPlot
 
 # Input data
 
-path = joinpath(Pkg.dir("Vann2"), "data", "atnasjo")
+path = joinpath(Pkg.dir("VannModels"), "data", "atnasjo")
 
-date, tair, prec, q_obs, frac_area, frac_glacier = loaddata(path)
+date, tair, prec, q_obs, frac_lus, frac_area = load_data(path)
 
 lat = 48   # Latitude
 
-lat = deg2rad(lat)    
+lat = deg2rad(lat) 
 
 pet_oudin = oudin(date, tair, lat, frac_area)
 

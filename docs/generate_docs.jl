@@ -2,7 +2,7 @@
 
 using Weave
 
-dir = Pkg.dir("Vann2")
+dir = Pkg.dir("VannModels")
 
 cd(joinpath(dir, "docs"))
 

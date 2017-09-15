@@ -1,14 +1,14 @@
 
 # Load packages
 
-using Vann2
+using VannModels
 using DataFrames
 using PyPlot
 
 
 # Input data
 
-path = joinpath(Pkg.dir("Vann2"), "data", "fetvatn")
+path = joinpath(Pkg.dir("VannModels"), "data", "fetvatn")
 
 date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 
@@ -59,6 +59,4 @@ pygui(true)
 
 plot(date, q_sim)
 plot(date, q_obs)
-
-
 

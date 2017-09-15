@@ -1,4 +1,4 @@
-module Vann2
+module VannModels
 
 # External packages
 

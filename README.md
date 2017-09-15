@@ -1,4 +1,4 @@
-# Vann
+# VannModels
 
 Aims of this package: 
 
@@ -13,7 +13,7 @@ To install the package, use the following command inside the Julia REPL:
 
 ````julia
 
-Pkg.clone("https://github.com/jmgnve/Vann2")
+Pkg.clone("https://github.com/jmgnve/VannModels")
 ````
 
 
@@ -22,7 +22,7 @@ Pkg.clone("https://github.com/jmgnve/Vann2")
 To load the package, use the command:
 
 ````julia
-using Vann2
+using VannModels
 ````
 
 
@@ -31,12 +31,12 @@ using Vann2
 
 ## Load input data
 
-Vann currently reads data in a specific text format (see examples for [Atnasjø](https://github.com/jmgnve/Vann2/tree/master/data/atnasjo) and [Fetvatn](https://github.com/jmgnve/Vann2/tree/master/data/fetvatn)). 
+VannModels currently reads data in a specific text format (see examples for [Atnasjø](https://github.com/jmgnve/VannModels/tree/master/data/atnasjo) and [Fetvatn](https://github.com/jmgnve/VannModels/tree/master/data/fetvatn)). 
 
 First, read the data for one of the example datasets, here Atnasjø:
 
 ````julia
-path = joinpath(Pkg.dir("Vann2"), "data", "atnasjo")
+path = joinpath(Pkg.dir("VannModels"), "data", "atnasjo")
 
 date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 ````
@@ -200,9 +200,9 @@ Available subsurface components:
 
 The components can be combined in any combination. However, note that the input arguments may differ between the components.
 
-For looking at the implementation of the components, click [here](https://github.com/jmgnve/Vann2/tree/master/src/components).
+For looking at the implementation of the components, click [here](https://github.com/jmgnve/VannModels/tree/master/src/components).
 
-The components are combined together to a complete model using [this code](https://github.com/jmgnve/Vann2/blob/master/src/models/model_components.jl).
+The components are combined together to a complete model using [this code](https://github.com/jmgnve/VannModels/blob/master/src/models/model_components.jl).
 
 ## Available models
 

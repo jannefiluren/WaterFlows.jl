@@ -1,4 +1,4 @@
-The Vann2.jl package is licensed under the GNU Public License, Version 2.0+:
+The VannModels.jl package is licensed under the GNU Public License, Version 2.0+:
 
 > Copyright (c) 2017: jmgnve.
 > This program is free software; you can redistribute it and/or modify
