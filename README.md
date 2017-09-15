@@ -125,7 +125,7 @@ snow = HbvLightSnow(tstep, time, frac_lus)
 
 glacier = NoGlacier()
 
-hydro = Gr4j(tstep, time)
+subsurf = Gr4j(tstep, time)
 ````
 
 
@@ -135,7 +135,7 @@ hydro = Gr4j(tstep, time)
 and create a model object:
 
 ````julia
-model = ModelComp(snow, glacier, hydro)
+model = ModelComp(snow, glacier, subsurf)
 ````
 
 
