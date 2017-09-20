@@ -37,6 +37,7 @@ Second, compute potential evapotranspiration for the catchment:
 
 ```{julia; results = "hidden"}
 lat = 60.0
+
 epot = oudin(date, tair, lat, frac_area)
 ```
 
@@ -108,13 +109,13 @@ q_sim = run_model(model, input)
 
 A model can be calibrated by running:
 
-```{julia; results = "hidden", eval = false}
+```{julia; eval = false}
 param_tuned = run_model_calib(model, input, q_obs, warmup = 1, verbose = :silent)
 ```
 
 The model can be ran using the best-fit parameters with the following command:
 
-```{julia; results = "hidden", eval = false}
+```{julia; eval = false}
 set_params!(model, param_tuned)
 
 q_sim = run_model(model, input)
