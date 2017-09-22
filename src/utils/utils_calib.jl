@@ -24,7 +24,7 @@ function run_model_calib(model::AbstractModel, input::AbstractInput, var_obs;
 
     calib_wrapper_tmp(param) = calib_wrapper(param, model, input, var_obs, warmup)
 
-    res = bboptimize(calib_wrapper_tmp; SearchRange = param_range, TraceMode = verbose,  MaxSteps=20000)
+    res = bboptimize(calib_wrapper_tmp; SearchRange = param_range, TraceMode = verbose,  MaxSteps=5000)
 
     best_candidate(res)
 
