@@ -49,6 +49,7 @@ Second, compute potential evapotranspiration for the catchment:
 
 ````julia
 lat = 60.0
+
 epot = oudin(date, tair, lat, frac_area)
 ````
 
@@ -125,7 +126,7 @@ snow = HbvLightSnow(tstep, time, frac_lus)
 
 glacier = NoGlacier()
 
-hydro = Gr4j(tstep, time)
+subsurf = Gr4j(tstep, time)
 ````
 
 
@@ -135,7 +136,7 @@ hydro = Gr4j(tstep, time)
 and create a model object:
 
 ````julia
-model = ModelComp(snow, glacier, hydro)
+model = ModelComp(snow, glacier, subsurf)
 ````
 
 
@@ -157,9 +158,9 @@ q_sim = run_model(model, input)
 A model can be calibrated by running:
 
 ````julia
+
 param_tuned = run_model_calib(model, input, q_obs, warmup = 1, verbose = :silent)
 ````
-
 
 
 
@@ -167,11 +168,11 @@ param_tuned = run_model_calib(model, input, q_obs, warmup = 1, verbose = :silent
 The model can be ran using the best-fit parameters with the following command:
 
 ````julia
+
 set_params!(model, param_tuned)
 
 q_sim = run_model(model, input)
 ````
-
 
 
 

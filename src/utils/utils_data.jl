@@ -47,8 +47,8 @@ end=#
 
 # Load operational data from text files
 
-function load_data(path, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
-                   file_prec = "Prec.txt", file_metadata = "metadata.txt")
+function load_data(path, file_q_obs = "runoff.txt", file_tair = "tair.txt",
+                   file_prec = "prec.txt", file_metadata = "metadata.txt")
 
   # Read air temperature data
 
@@ -80,16 +80,16 @@ function load_data(path, file_q_obs = "Q_obs.txt", file_tair = "Tair.txt",
 
   df_tmp = CSV.read("$path/$file_metadata", delim = ";", header = true)
 
-  area = convert(Array{Float64,1}, df_tmp[:area])
+  area = convert(Array{Float64,1}, df_tmp[:area_sum])
   frac_area = area / sum(area)
 
-  frac_glacier = convert(Array{Float64,1}, df_tmp[:lus_glacier]) / 100.0
+  frac_glacier = convert(Array{Float64,1}, df_tmp[:lus_glacier_mean]) / 100.0
 
   frac_lus = DataFrame()
   frac_lus[:glacier] = frac_area .* frac_glacier
   frac_lus[:open] = frac_area - frac_lus[:glacier]
 
-  elev = convert(Array{Float64,1}, df_tmp[:elevation])
+  elev = convert(Array{Float64,1}, df_tmp[:elevation_mean])
 
   # Get time data
 
