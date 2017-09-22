@@ -85,7 +85,7 @@ time = date[1]
 Next setup a model object containing necessary data required for running the model:
 
 ````julia
-model = setup_hbv_light(tstep, time, frac_lus)
+model = model_hbv_light(tstep, time, frac_lus)
 ````
 
 

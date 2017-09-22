@@ -61,7 +61,7 @@ time = date[1]
 Next setup a model object containing necessary data required for running the model:
 
 ```{julia; results = "hidden"}
-model = setup_hbv_light(tstep, time, frac_lus)
+model = model_hbv_light(tstep, time, frac_lus)
 ```
 
 Finally run the model:

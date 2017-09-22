@@ -36,7 +36,8 @@ export Gr4j, Hbv, HbvLightSubsurf
 # Model setups
 
 export ModelComp
-export setup_hbv_light
+export model_hbv_light
+export model_gr4j
 
 # Utilities
 
