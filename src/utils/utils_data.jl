@@ -27,7 +27,7 @@ function load_data(path, file_q_obs = "runoff.txt", file_tair = "tair.txt",
                    dateformat="yyyy-mm-dd HH:MM", nullable = false, types = [DateTime, Float64])
   q_obs = Array(tmp[:, 2])
 
-  q_obs[q_obs .== -999.0] = NaN
+  q_obs[q_obs .< 0.0] = NaN
 
   # Read metadata
 
