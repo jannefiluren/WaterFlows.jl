@@ -44,6 +44,35 @@ function nse(var_sim, var_obs)
 end
 
 
+""" Compute Kling-Gupta efficiency. """
+function kge(var_sim, var_obs)
+    
+    if all(isnan, var_sim) || all(isnan, var_obs)
+
+        kge = NaN
+
+    else
+
+        ikeep = .!isnan.(var_obs)
+
+        var_sim = var_sim[ikeep]
+        var_obs = var_obs[ikeep]
+
+        r = cor(var_sim, var_obs)
+
+        beta = mean(var_sim) / mean(var_obs)
+
+        gamma = (std(var_sim) / mean(var_sim)) / (std(var_obs) / mean(var_obs))
+
+        kge = 1 - sqrt( (r-1)^2 + (beta-1)^2 + (gamma-1)^2 )
+
+    end
+
+    return kge
+
+end
+
+
 """ Get parameter values for a model."""
 function get_params(model::AbstractModel)
     res = []

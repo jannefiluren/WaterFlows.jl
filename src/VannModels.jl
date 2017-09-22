@@ -48,6 +48,7 @@ export epot_zero, hamon, oudin
 export init_states!, set_params!
 export run_model_calib
 export get_params
+export nse, kge
 
 # Utilities
 
