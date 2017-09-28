@@ -5,20 +5,20 @@ mutable struct NoSnow <: AbstractSnow
     p_in::Array{Float64,1}
     tair::Array{Float64,1}
     q_out::Array{Float64,1}   # This needs to be a 2d array
-    frac::Array{Float64,1}    # This needs to be a 2d array
+    frac_lus::Array{Float64,1}    # This needs to be a 2d array
     tstep::Float64
     time::DateTime
     
 end
 
 
-function NoSnow(tstep::Float64, time::DateTime, frac::Array{Float64,1})
+function NoSnow(tstep::Float64, time::DateTime, frac_lus::Array{Float64,1})
     
-    p_in  = zeros(Float64, length(frac))
-    tair  = zeros(Float64, length(frac))
-    q_out = zeros(Float64, length(frac))
+    p_in  = zeros(Float64, length(frac_lus))
+    tair  = zeros(Float64, length(frac_lus))
+    q_out = zeros(Float64, length(frac_lus))
     
-    NoSnow(p_in, tair, q_out, frac, tstep, time)
+    NoSnow(p_in, tair, q_out, frac_lus, tstep, time)
     
 end
 
@@ -39,7 +39,7 @@ end
 
 function run_timestep(m::NoSnow)
     
-    for reg in eachindex(m.frac)
+    for reg in eachindex(m.frac_lus)
         
         m.q_out[reg] = m.p_in[reg]
         

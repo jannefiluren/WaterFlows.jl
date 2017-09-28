@@ -6,7 +6,7 @@ mutable struct ModelComp{s <: AbstractSnow, g <: AbstractGlacier, h <: AbstractS
     
     snow::s
     glacier::g
-    hydro::h
+    subsurf::h
     
 end
 
@@ -32,13 +32,13 @@ function run_model(model::ModelComp, input::InputPTE)
 
         # Run subsurface model component
 
-        set_input(model.hydro, model.snow, model.glacier, input, t)
+        set_input(model.subsurf, model.snow, model.glacier, input, t)
 
-        run_timestep(model.hydro)
+        run_timestep(model.subsurf)
 
         # Collect runoff as output
 
-        q_out[t] = model.hydro.q_out
+        q_out[t] = model.subsurf.q_out
 
     end
 
@@ -51,7 +51,7 @@ end
 
 @inline function set_input(s::AbstractSnow, input::InputPTE, t::Int64)
 
-    for reg in 1:size(s.frac, 2)
+    for reg in 1:size(s.frac_lus, 2)
         s.tair[reg] = input.tair[reg, t]
         s.p_in[reg] = input.prec[reg, t]
     end
@@ -63,7 +63,7 @@ end
 
 @inline function set_input(g::AbstractGlacier, input::InputPTE, t::Int64)
 
-    for reg in eachindex(g.frac)
+    for reg in eachindex(g.frac_lus)
         g.tair[reg] = input.tair[reg, t]
     end
     
@@ -85,12 +85,12 @@ end
     
     h.p_in = 0.0
 
-    for reg in eachindex(s.frac)
-        h.p_in += s.frac[reg] * s.q_out[reg]
+    for reg in eachindex(s.frac_lus)
+        h.p_in += s.frac_lus[reg] * s.q_out[reg]
     end
     
-    for reg in eachindex(g.frac)
-        h.p_in += g.frac[reg] * g.q_out[reg]
+    for reg in eachindex(g.frac_lus)
+        h.p_in += g.frac_lus[reg] * g.q_out[reg]
     end
     
 end
@@ -104,8 +104,8 @@ end
     
     h.p_in = 0.0
 
-    for reg in eachindex(s.frac)
-        h.p_in += s.frac[reg] * s.q_out[reg]
+    for reg in eachindex(s.frac_lus)
+        h.p_in += s.frac_lus[reg] * s.q_out[reg]
     end
     
 end
@@ -117,7 +117,7 @@ end
 
     h.epot = input.epot[t]
 
-    nlus, nreg = size(h.frac)
+    nlus, nreg = size(h.frac_lus)
 
     h.p_in .= s.q_out
 
@@ -139,7 +139,7 @@ end
     
     h.epot = input.epot[t]
 
-    nlus, nreg = size(h.frac)
+    nlus, nreg = size(h.frac_lus)
 
     h.p_in  .= s.q_out
     h.tth   .= s.tth

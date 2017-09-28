@@ -5,7 +5,7 @@ mutable struct TinGlacier <: AbstractGlacier
     ddf::Float64
     tair::Array{Float64,1}
     q_out::Array{Float64,1}
-    frac::Array{Float64,1}
+    frac_lus::Array{Float64,1}
     iglacier::Int64
     tstep::Float64
     time::DateTime
@@ -18,15 +18,15 @@ function TinGlacier(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     iglacier = find(names(frac_lus) .== :glacier)
     iglacier = iglacier[1]
 
-    frac = convert(Array{Float64,2}, frac_lus)
-    frac = frac[:, iglacier]
+    frac_lus = convert(Array{Float64,2}, frac_lus)
+    frac_lus = frac_lus[:, iglacier]
     
-    tair  = zeros(Float64, length(frac))
-    q_out = zeros(Float64, length(frac))
+    tair  = zeros(Float64, length(frac_lus))
+    q_out = zeros(Float64, length(frac_lus))
 
     ddf = 5.0
     
-    TinGlacier(ddf, tair, q_out, frac, iglacier, tstep, time)
+    TinGlacier(ddf, tair, q_out, frac_lus, iglacier, tstep, time)
     
 end
 
@@ -47,7 +47,7 @@ end
 
 function run_timestep(g::TinGlacier, s::AbstractSnow)
     
-    for reg in eachindex(g.frac)
+    for reg in eachindex(g.frac_lus)
         
         if s.swe[g.iglacier, 1] > 0.0
             g.q_out[reg] = 0.0

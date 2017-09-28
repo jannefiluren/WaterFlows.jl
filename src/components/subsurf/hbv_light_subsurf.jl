@@ -23,7 +23,7 @@ mutable struct HbvLightSubsurf <: AbstractSubsurfDist
     epot::Float64
     q_out::Float64
     lake::Float64                 # This needs to be handled!!!
-    frac::Array{Float64,2}
+    frac_lus::Array{Float64,2}
     tstep::Float64
     time::DateTime
     
@@ -37,10 +37,10 @@ function HbvLightSubsurf(tstep::Float64, time::DateTime, frac_lus::DataFrame, la
 
     @assert lake == 0.0 "No lakes allowed currently"
     
-    frac = convert(Array{Float64,2}, frac_lus)
-    frac = transpose(frac)
+    frac_lus = convert(Array{Float64,2}, frac_lus)
+    frac_lus = transpose(frac_lus)
 
-    nlus, nreg = size(frac)
+    nlus, nreg = size(frac_lus)
     
     sm = zeros(nlus, nreg)
     suz = 0.0
@@ -70,7 +70,7 @@ function HbvLightSubsurf(tstep::Float64, time::DateTime, frac_lus::DataFrame, la
     st_uh = zeros(ord_uh)
     
     HbvLightSubsurf(sm, suz, slz, st_uh, ord_uh, perc, k0, k1, k2, uzl, tth, pcorr,
-    fc, lp, beta, maxbas, snow, p_in, tair, epot, q_out, lake, frac, tstep, time)
+    fc, lp, beta, maxbas, snow, p_in, tair, epot, q_out, lake, frac_lus, tstep, time)
     
 end
 
@@ -114,11 +114,11 @@ function run_timestep(m::HbvLightSubsurf)
     to_qsum = 0.0
     avg_aet = 0.0
     
-    for ireg = 1:size(m.frac, 2)
+    for ireg = 1:size(m.frac_lus, 2)
         
-        for ilus = 1:size(m.frac, 1)
+        for ilus = 1:size(m.frac_lus, 1)
             
-            if m.frac[ilus, ireg] > 0.0
+            if m.frac_lus[ilus, ireg] > 0.0
                 
                 sm   = m.sm[ilus, ireg]
                 fc   = m.fc[ilus]
@@ -167,8 +167,8 @@ function run_timestep(m::HbvLightSubsurf)
                     sm = 0.0
                 end
                 
-                avg_aet = avg_aet + aet * m.frac[ilus, ireg]
-                to_qsum = to_qsum + to_q * m.frac[ilus, ireg]
+                avg_aet = avg_aet + aet * m.frac_lus[ilus, ireg]
+                to_qsum = to_qsum + to_q * m.frac_lus[ilus, ireg]
                 m.sm[ilus, ireg] = sm
                 
             end

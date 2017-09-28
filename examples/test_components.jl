@@ -37,9 +37,9 @@ snow = HbvLightSnow(tstep, time, frac_lus)
 
 glacier = NoGlacier()
 
-hydro = Hbv(tstep, time)
+subsurf = Hbv(tstep, time)
 
-model = ModelComp(snow, glacier, hydro)
+model = ModelComp(snow, glacier, subsurf)
 
 q_obs = run_model(model, input)
 

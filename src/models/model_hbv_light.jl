@@ -8,9 +8,9 @@ function model_hbv_light(tstep, time, frac_lus)
     
     glacier = NoGlacier()
     
-    hydro = HbvLightSubsurf(tstep, time, frac_lus, lake)
+    subsurf = HbvLightSubsurf(tstep, time, frac_lus, lake)
 
-    model = ModelComp(snow, glacier, hydro)
+    model = ModelComp(snow, glacier, subsurf)
 
 end
 
@@ -22,8 +22,8 @@ function model_gr4j(tstep, time, frac_lus)
     
     glacier = TinGlacier(tstep, time, frac_lus)
     
-    hydro = Gr4j(tstep, time)
+    subsurf = Gr4j(tstep, time)
 
-    model = ModelComp(snow, glacier, hydro)
+    model = ModelComp(snow, glacier, subsurf)
 
 end
