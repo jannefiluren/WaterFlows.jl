@@ -80,6 +80,6 @@ include("components/subsurf/hbv_light_subsurf.jl")
 # Model setups
 
 include("models/model_components.jl")
-include("models/model_hbv_light.jl")
+include("models/model_predefined.jl")
 
 end

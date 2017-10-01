@@ -11,18 +11,14 @@ mutable struct HbvLightSubsurf <: AbstractSubsurfDist
     k1::Float64
     k2::Float64
     uzl::Float64
-    tth::Array{Float64,1}
-    pcorr::Array{Float64,1}
     fc::Array{Float64,1}
     lp::Array{Float64,1}
     beta::Array{Float64,1}
     maxbas::Float64
     snow::Array{Bool,2}
     p_in::Array{Float64,2}
-    tair::Array{Float64,2}
     epot::Float64
     q_out::Float64
-    lake::Float64                 # This needs to be handled!!!
     frac_lus::Array{Float64,2}
     tstep::Float64
     time::DateTime
@@ -31,11 +27,7 @@ end
 
 
 
-function HbvLightSubsurf(tstep::Float64, time::DateTime, frac_lus::DataFrame, lake::Float64)
-    
-    @assert tstep == 24.0 "Time step outside allowed range (24.0h)"
-
-    @assert lake == 0.0 "No lakes allowed currently"
+function HbvLightSubsurf(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     
     frac_lus = convert(Array{Float64,2}, frac_lus)
     frac_lus = transpose(frac_lus)
@@ -55,22 +47,19 @@ function HbvLightSubsurf(tstep::Float64, time::DateTime, frac_lus::DataFrame, la
     fc = fill(250.0, nlus)
     lp = fill(0.7, nlus)
     beta = fill(3.0, nlus)
-    tth = fill(0.0, nlus)      # Temperature threshold (set equal to snow model in connector function)
-    pcorr = fill(1.0, nlus)     # Snowfall correction factor (set equal to snow model in connector function)
     maxbas = 2.5
     
     snow = fill(false, nlus, nreg)
 
     p_in = fill(0.0, nlus, nreg)
-    tair = fill(0.0, nlus, nreg)
     epot = 0.0
     q_out = 0.0
     
     ord_uh = compute_hbv_ord(maxbas)
     st_uh = zeros(ord_uh)
     
-    HbvLightSubsurf(sm, suz, slz, st_uh, ord_uh, perc, k0, k1, k2, uzl, tth, pcorr,
-    fc, lp, beta, maxbas, snow, p_in, tair, epot, q_out, lake, frac_lus, tstep, time)
+    HbvLightSubsurf(sm, suz, slz, st_uh, ord_uh, perc, k0, k1, k2, uzl, fc,
+    lp, beta, maxbas, snow, p_in, epot, q_out, frac_lus, tstep, time)
     
 end
 
@@ -108,8 +97,6 @@ end
 function run_timestep(m::HbvLightSubsurf)
     
     epot = m.epot
-    
-    epot_land = epot * (1 - m.lake)
     
     to_qsum = 0.0
     avg_aet = 0.0
@@ -155,9 +142,9 @@ function run_timestep(m::HbvLightSubsurf)
                 
                 mean_sm = (sm + old_sm) / 2.0
                 if mean_sm < (lp * fc)
-                    aet = epot_land * mean_sm / (lp * fc)
+                    aet = epot * mean_sm / (lp * fc)
                 else
-                    aet = epot_land
+                    aet = epot
                 end
                 #if snow                       # Currently snow does not influence actual evapotranspiration
                 #    aet = 0.0
@@ -181,28 +168,14 @@ function run_timestep(m::HbvLightSubsurf)
     
     # generation of runoff
     m.suz = m.suz + to_suz
-    if ( m.suz - m.perc / (1 - m.lake) ) < 0.0
-        m.slz = m.slz + m.suz * (1.0 - m.lake)
+    if ( m.suz - m.perc ) < 0.0
+        m.slz = m.slz + m.suz
         m.suz = 0.0
     else
         m.slz = m.slz + m.perc
-        m.suz = m.suz - m.perc / (1.0 - m.lake)
+        m.suz = m.suz - m.perc
     end
-    
-    tt = mean(m.tth)   # CHECK WITH JAN WHAT THIS MEANS
-    pcorr = mean(m.pcorr)   # CHECK WITH JAN WHAT THIS MEANS
-    
-    if mean(m.tair) > tt   # CHECK WITH JAN WHAT THIS MEANS
-        m.slz = max(m.slz - epot * m.lake, 0.0)
-        avg_aet = avg_aet + min(m.slz, epot * m.lake)
-    end
-
-    if mean(m.tair) <= tt   # CHECK WITH JAN WHAT THIS MEANS
-        m.slz = m.slz + pcorr * mean(m.p_in) * m.lake   # CHECK WITH JAN WHAT THIS MEANS
-    else
-        m.slz = m.slz + mean(m.p_in) * m.lake   # CHECK WITH JAN WHAT THIS MEANS
-    end
-    
+           
     q_box1 = m.k1 * m.suz
     if m.suz < m.uzl
         q_box0 = 0.0
@@ -227,7 +200,7 @@ function run_timestep(m::HbvLightSubsurf)
     
     m.q_out = m.st_uh[1]
     
-    return nothing    
+    return nothing
     
 end    
 

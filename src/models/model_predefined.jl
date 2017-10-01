@@ -2,13 +2,11 @@
 
 function model_hbv_light(tstep, time, frac_lus)
 
-    lake = 0.0  # TODO: add this to land use
-
     snow = HbvLightSnow(tstep, time, frac_lus)
     
     glacier = NoGlacier()
     
-    subsurf = HbvLightSubsurf(tstep, time, frac_lus, lake)
+    subsurf = HbvLightSubsurf(tstep, time, frac_lus)
 
     model = ModelComp(snow, glacier, subsurf)
 
