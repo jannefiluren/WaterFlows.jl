@@ -199,6 +199,10 @@ function run_timestep(m::HbvLightSubsurf)
     # Output runoff
     
     m.q_out = m.st_uh[1]
+
+    # Update time
+
+    m.time += Dates.Hour(m.tstep)
     
     return nothing
     

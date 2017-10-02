@@ -137,6 +137,8 @@ function run_timestep(m::HbvLightSnow)
         end
         
     end
+
+    m.time += Dates.Hour(m.tstep)
     
     return nothing
     
