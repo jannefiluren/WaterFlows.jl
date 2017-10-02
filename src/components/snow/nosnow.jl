@@ -30,7 +30,9 @@ function get_param_ranges(model::NoSnow)
 end
 
 
-function init_states!(model::NoSnow)
+function init_states!(model::NoSnow, init_time::DateTime)
+    
+    model.time = init_time
 
     return nothing
 

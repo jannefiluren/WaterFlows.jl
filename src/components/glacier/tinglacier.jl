@@ -38,7 +38,9 @@ function get_param_ranges(model::TinGlacier)
 end
 
 
-function init_states!(model::TinGlacier)
+function init_states!(model::TinGlacier, init_time::DateTime)
+    
+    model.time = init_time
 
     return nothing
 

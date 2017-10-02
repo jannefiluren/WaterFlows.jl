@@ -44,7 +44,9 @@ function get_param_ranges(model::HockGlacier)
 end
 
 
-function init_states!(model::HockGlacier)
+function init_states!(model::HockGlacier, init_time::DateTime)
+
+    model.time = init_time
     
     return nothing
     

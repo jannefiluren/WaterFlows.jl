@@ -7,7 +7,7 @@ function calib_wrapper(param, model::AbstractModel, input::AbstractInput, var_ob
 
     set_params!(model, param)
 
-    init_states!(model)
+    init_states!(model, input.time[1])
 
     var_sim = run_model(model, input)
 
@@ -151,13 +151,13 @@ end
 
 
 """ Initilize model state variables. """
-function init_states!(model::AbstractModel)
+function init_states!(model::AbstractModel, init_time::DateTime)
 
     for name_comp in fieldnames(model)
 
         comp = getfield(model, name_comp)
 
-        init_states!(comp)
+        init_states!(comp, init_time)
 
         setfield!(model, name_comp, comp)
 

@@ -59,7 +59,9 @@ function get_param_ranges(m::HbvLightSnow)
 end
 
 
-function init_states!(m::HbvLightSnow)
+function init_states!(m::HbvLightSnow, init_time::DateTime)
+    
+    m.time = init_time
     
     m.swe .= zeros(m.swe)
     m.whc .= zeros(m.whc)

@@ -81,7 +81,9 @@ function get_param_ranges(m::HbvLightSubsurf)
 end
 
 
-function init_states!(m::HbvLightSubsurf)
+function init_states!(m::HbvLightSubsurf, init_time::DateTime)
+    
+    m.time = init_time
     
     m.sm .= zeros(m.sm)
     m.suz = 0.0

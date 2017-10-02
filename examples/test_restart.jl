@@ -21,7 +21,7 @@ lat = 60.0
 
 epot = oudin(date, tair, lat, frac_area)
 
-input = InputPTE(prec, tair, epot)
+input = InputPTE(date, prec, tair, epot)
 
 ############################################################################################
 

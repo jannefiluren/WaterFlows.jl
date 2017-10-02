@@ -60,7 +60,7 @@ epot = oudin(date, tair, lat, frac_area)
 Third, create an object containing the input data that is required for running the models:
 
 ````julia
-input = InputPTE(prec, tair, epot)
+input = InputPTE(date, prec, tair, epot)
 ````
 
 

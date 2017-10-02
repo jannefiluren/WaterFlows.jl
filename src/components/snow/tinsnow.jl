@@ -44,7 +44,9 @@ function get_param_ranges(model::TinSnow)
 end
 
 
-function init_states!(model::TinSnow)
+function init_states!(model::TinSnow, init_time::DateTime)
+    
+    model.time = init_time
     
     for i in eachindex(model.swe)
         model.swe[i] = 0.0

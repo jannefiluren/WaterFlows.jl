@@ -61,7 +61,9 @@ function get_param_ranges(model::Gr4j)
 end
 
 
-function init_states!(model::Gr4j)
+function init_states!(model::Gr4j, init_time::DateTime)
+    
+    model.time = init_time
     
     model.st[1] = 0.3 * model.x1
     model.st[2] = 0.5 * model.x3

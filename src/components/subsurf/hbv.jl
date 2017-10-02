@@ -62,7 +62,9 @@ function get_param_ranges(m::Hbv)
 end
 
 
-function init_states!(m::Hbv)
+function init_states!(m::Hbv, init_time::DateTime)
+    
+    m.time = init_time
     
     m.sm      = 0.0
     m.suz     = 0.0

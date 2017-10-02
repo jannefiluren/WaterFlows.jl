@@ -35,7 +35,7 @@ function get_param_ranges(model::NoGlacier)
 end
 
 
-function init_states!(model::NoGlacier)
+function init_states!(model::NoGlacier, init_time::DateTime)
 
     return nothing
 
