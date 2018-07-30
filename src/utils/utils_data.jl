@@ -61,8 +61,8 @@ function crop_data(date, tair, prec, q_obs, date_start, date_stop)
 
   # Find indicies
 
-  istart = find(date .== date_start)
-  istop = find(date .== date_stop)
+  istart = findall(date .== date_start)
+  istop = findall(date .== date_stop)
 
   # Test if ranges are valid
 
@@ -88,7 +88,7 @@ function crop_data(date, tair, prec, q_obs, date_start)
 
   # Find indicies
 
-  istart = find(date .== date_start)
+  istart = findall(date .== date_start)
 
   # Test if ranges are valid
 

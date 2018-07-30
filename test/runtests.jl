@@ -1,4 +1,4 @@
 using VannModels
-using Base.Test
+using Test
 
 include("solar_rad.jl")

@@ -18,7 +18,7 @@ end
 
 function HockGlacier(tstep::Float64, time::DateTime, frac_lus::DataFrame, lat::Float64, elev::Array{Float64,1})
     
-    iglacier = find(names(frac_lus) .== :glacier)
+    iglacier = findall(names(frac_lus) .== :glacier)
     iglacier = iglacier[1]
     
     frac_lus = convert(Array{Float64,2}, frac_lus)

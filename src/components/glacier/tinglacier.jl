@@ -15,7 +15,7 @@ end
 
 function TinGlacier(tstep::Float64, time::DateTime, frac_lus::DataFrame)
 
-    iglacier = find(names(frac_lus) .== :glacier)
+    iglacier = findall(names(frac_lus) .== :glacier)
     iglacier = iglacier[1]
 
     frac_lus = convert(Array{Float64,2}, frac_lus)

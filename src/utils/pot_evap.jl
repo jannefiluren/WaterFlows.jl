@@ -178,7 +178,7 @@ function monthly_mean(date, values)
     
     for month in unique(months)
         
-        imonth = find(month .== months)
+        imonth = findall(month .== months)
         
         values[imonth] .= mean(values[imonth]) 
         
