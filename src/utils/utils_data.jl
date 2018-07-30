@@ -9,7 +9,7 @@ function load_data(path, file_q_obs = "runoff.txt", file_tair = "tair.txt",
   nsep  = length(matchall(r";", str))
   tmp   = CSV.read("$path/$file_tair", delim = ";", header = false,
                    dateformat="yyyy-mm-dd HH:MM", allowmissing=:none, types = vcat(DateTime, repmat([Float64], nsep)))
-  tair  = Array(tmp[:, 2:end])
+  tair  = convert(Array, tmp[:, 2:end])
   tair  = transpose(tair)
 
   # Read precipitation data
@@ -18,14 +18,14 @@ function load_data(path, file_q_obs = "runoff.txt", file_tair = "tair.txt",
   nsep  = length(matchall(r";", str))
   tmp   = CSV.read("$path/$file_prec", delim = ";", header = false,
                   dateformat="yyyy-mm-dd HH:MM", allowmissing=:none, types = vcat(DateTime, repmat([Float64], nsep)))
-  prec  = Array(tmp[:, 2:end])
+  prec  = convert(Array, tmp[:, 2:end])
   prec  = transpose(prec)
 
   # Read runoff data
 
   tmp   = CSV.read("$path/$file_q_obs", delim = ";", header = false,
                    dateformat="yyyy-mm-dd HH:MM", allowmissing=:none, types = [DateTime, Float64])
-  q_obs = Array(tmp[:, 2])
+  q_obs = convert(Array, tmp[:, 2])
 
   q_obs[q_obs .< 0.0] = NaN
 
@@ -46,7 +46,7 @@ function load_data(path, file_q_obs = "runoff.txt", file_tair = "tair.txt",
 
   # Get time data
 
-  date = Array(tmp[:, 1])
+  date = convert(Array, tmp[:, 1])
 
   # Return data
 

@@ -2,7 +2,7 @@ module VannModels
 
 # External packages
 
-using BlackBoxOptim
+#using BlackBoxOptim
 using CSV
 using Distributions
 using DataFrames
