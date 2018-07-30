@@ -14,9 +14,9 @@ function oudin(date::Array{DateTime,1}, tair::Array{Float64,2}, lat::Float64, fr
         pet[reg,:] = oudin(date, tair[reg,:] , lat) * frac_area[reg]
     end
 
-    pet = sum(pet, 1)
+    pet = sum(pet, dims = 1)
 
-    squeeze(pet,1)
+    squeeze(pet, dims = 1)
 
 end
 
@@ -63,7 +63,7 @@ function oudin(tair::Float64, date::DateTime, lat::Float64)
     if cosgz2 >= 1.0
         singz = 0.0
     else
-        singz = sqrt(1.-cosgz2)
+        singz = sqrt(1.0 - cosgz2)
     end
 
     cosom = 1.0-cosgz/cosfi/costeta
@@ -120,7 +120,7 @@ function hamon(date::Array{DateTime,1}, tair::Array{Float64,2}, lat::Float64, fr
         pet[reg,:] = hamon(date, tair[reg,:] , lat) * frac_area[reg]
     end
 
-    pet = sum(pet, 1)
+    pet = sum(pet, dims = 1)
 
     squeeze(pet,1)
 

@@ -56,7 +56,7 @@ function HbvLightSubsurf(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     q_out = 0.0
     
     ord_uh = compute_hbv_ord(maxbas)
-    st_uh = zeros(ord_uh)
+    st_uh = zero(ord_uh)
     
     HbvLightSubsurf(sm, suz, slz, st_uh, ord_uh, perc, k0, k1, k2, uzl, fc,
     lp, beta, maxbas, snow, p_in, epot, q_out, frac_lus, tstep, time)

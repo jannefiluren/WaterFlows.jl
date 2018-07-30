@@ -6,20 +6,20 @@ function load_data(path, file_q_obs = "runoff.txt", file_tair = "tair.txt",
   # Read air temperature data
 
   str   = readline("$path/$file_tair")
-  nsep  = length(matchall(r";", str))
+  nsep  = length(collect(m.match for m = eachmatch(r";", str)))
   tmp   = CSV.read("$path/$file_tair", delim = ";", header = false,
-                   dateformat="yyyy-mm-dd HH:MM", allowmissing=:none, types = vcat(DateTime, repmat([Float64], nsep)))
+                   dateformat="yyyy-mm-dd HH:MM", allowmissing=:none, types = vcat(DateTime, repeat([Float64], nsep)))
   tair  = convert(Array, tmp[:, 2:end])
-  tair  = transpose(tair)
+  tair  = permutedims(tair)
 
   # Read precipitation data
 
   str   = readline("$path/$file_tair")
-  nsep  = length(matchall(r";", str))
+  nsep  = length(collect(m.match for m = eachmatch(r";", str)))
   tmp   = CSV.read("$path/$file_prec", delim = ";", header = false,
-                  dateformat="yyyy-mm-dd HH:MM", allowmissing=:none, types = vcat(DateTime, repmat([Float64], nsep)))
+                  dateformat="yyyy-mm-dd HH:MM", allowmissing=:none, types = vcat(DateTime, repeat([Float64], nsep)))
   prec  = convert(Array, tmp[:, 2:end])
-  prec  = transpose(prec)
+  prec  = permutedims(prec)
 
   # Read runoff data
 
@@ -27,7 +27,7 @@ function load_data(path, file_q_obs = "runoff.txt", file_tair = "tair.txt",
                    dateformat="yyyy-mm-dd HH:MM", allowmissing=:none, types = [DateTime, Float64])
   q_obs = convert(Array, tmp[:, 2])
 
-  q_obs[q_obs .< 0.0] = NaN
+  q_obs[q_obs .< 0.0] .= NaN
 
   # Read metadata
 

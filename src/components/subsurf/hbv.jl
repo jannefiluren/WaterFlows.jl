@@ -189,8 +189,8 @@ end
 
 function compute_hbv_ord(maxbas)
     
-    triang = Distributions.TriangularDist(0, maxbas)
-    triang_cdf = Distributions.cdf(triang, 0:20)
+    triang = Distributions.TriangularDist(0, maxbas)  # Deprecation warning #26212 ???
+    triang_cdf = Distributions.cdf.(triang, 0:20)
     ord_uh = diff(triang_cdf)
     
 end
