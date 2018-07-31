@@ -63,8 +63,8 @@ function init_states!(m::HbvLightSnow, init_time::DateTime)
     
     m.time = init_time
     
-    m.swe .= zeros(m.swe)
-    m.whc .= zeros(m.whc)
+    m.swe .= zero(m.swe)
+    m.whc .= zero(m.whc)
     
 end
 

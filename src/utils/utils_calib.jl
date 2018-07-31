@@ -39,7 +39,7 @@ function nse(var_sim, var_obs)
     var_sim = var_sim[ikeep]
     var_obs = var_obs[ikeep]
     
-    1.0 - sum((var_sim - var_obs).^2) / sum((var_obs - mean(var_obs)).^2)
+    1.0 .- sum((var_sim .- var_obs).^2) / sum((var_obs .- mean(var_obs)).^2)
 
 end
 
@@ -92,10 +92,10 @@ end
 """ Get parameter ranges for a model."""
 function get_param_ranges(model::AbstractModel)
     res = []
-    for name_comp in fieldnames(model)
+    for name_comp in fieldnames(typeof(model))
         comp = getfield(model, name_comp)
         param_ranges = get_param_ranges(comp)
-        for name_field in fieldnames(comp)
+        for name_field in fieldnames(typeof(comp))
             if haskey(param_ranges, name_field)
                 param_tmp = getfield(comp, name_field)
                 for i in 1:length(param_tmp)
@@ -126,10 +126,10 @@ function set_params!(model::AbstractModel, param_input)
     
     # Set parameter values
     iparam = 1
-    for name_comp in fieldnames(model)
+    for name_comp in fieldnames(typeof(model))
         comp = getfield(model, name_comp)
         param_ranges = get_param_ranges(comp)
-        for name_field in fieldnames(comp)
+        for name_field in fieldnames(typeof(comp))
             if haskey(param_ranges, name_field)
                 param_tmp = getfield(comp, name_field)
                 if param_tmp isa Float64
@@ -153,7 +153,7 @@ end
 """ Initilize model state variables. """
 function init_states!(model::AbstractModel, init_time::DateTime)
 
-    for name_comp in fieldnames(model)
+    for name_comp in fieldnames(typeof(model))
 
         comp = getfield(model, name_comp)
 

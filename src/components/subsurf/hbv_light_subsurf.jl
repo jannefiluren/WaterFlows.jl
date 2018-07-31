@@ -85,7 +85,7 @@ function init_states!(m::HbvLightSubsurf, init_time::DateTime)
     
     m.time = init_time
     
-    m.sm .= zeros(m.sm)
+    m.sm .= zero(m.sm)
     m.suz = 0.0
     m.slz = 0.0
     
