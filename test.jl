@@ -2,7 +2,7 @@
 
 using VannModels
 
-path = joinpath(Pkg.dir("VannModels"), "data", "atnasjo")
+path = joinpath(pathof(VannModels), "data", "atnasjo")
 
 date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 

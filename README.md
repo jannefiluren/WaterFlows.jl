@@ -12,22 +12,14 @@ Other necessary code for hydrological modelling, like input data handling and ev
 To install the package, use the following command inside the Julia REPL:
 
 ````julia
-
 Pkg.clone("https://github.com/jmgnve/VannModels")
 ````
-
-
-
 
 To load the package, use the command:
 
 ````julia
 using VannModels
 ````
-
-
-
-
 
 ## Load input data
 
@@ -36,14 +28,10 @@ VannModels currently reads data in a specific text format (see examples for [Atn
 First, read the data for one of the example datasets, here Atnasjø:
 
 ````julia
-path = joinpath(Pkg.dir("VannModels"), "data", "atnasjo")
+path = joinpath(pathof(VannModels), "data", "atnasjo")
 
 date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 ````
-
-
-
-
 
 Second, compute potential evapotranspiration for the catchment:
 
@@ -53,19 +41,11 @@ lat = 60.0
 epot = oudin(date, tair, lat, frac_area)
 ````
 
-
-
-
-
 Third, create an object containing the input data that is required for running the models:
 
 ````julia
 input = InputPTE(date, prec, tair, epot)
 ````
-
-
-
-
 
 ## Setting up and running a complete and predefined model
 
@@ -79,29 +59,17 @@ tstep = 24.0
 time = date[1]
 ````
 
-
-
-
-
 Next setup a model object containing necessary data required for running the model:
 
 ````julia
 model = model_hbv_light(tstep, time, frac_lus)
 ````
 
-
-
-
-
 Finally run the model:
 
 ````julia
 q_sim = run_model(model, input)
 ````
-
-
-
-
 
 ## Building and running a model from components
 
@@ -115,10 +83,6 @@ tstep = 24.0
 time = date[1]
 ````
 
-
-
-
-
 Next specify a snow, glacier and subsurface component:
 
 ````julia
@@ -129,19 +93,11 @@ glacier = NoGlacier()
 subsurf = Gr4j(tstep, time)
 ````
 
-
-
-
-
 and create a model object:
 
 ````julia
 model = ModelComp(snow, glacier, subsurf)
 ````
-
-
-
-
 
 Finally run the model:
 
@@ -149,33 +105,21 @@ Finally run the model:
 q_sim = run_model(model, input)
 ````
 
-
-
-
-
 ## Model calibration
 
 A model can be calibrated by running:
 
 ````julia
-
 param_tuned = run_model_calib(model, input, q_obs, warmup = 1, verbose = :silent)
 ````
-
-
-
 
 The model can be ran using the best-fit parameters with the following command:
 
 ````julia
-
 set_params!(model, param_tuned)
 
 q_sim = run_model(model, input)
 ````
-
-
-
 
 ## Available components
 
