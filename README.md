@@ -12,7 +12,8 @@ Other necessary code for hydrological modelling, like input data handling and ev
 To install the package, use the following command inside the Julia REPL:
 
 ````julia
-Pkg.clone("https://github.com/jmgnve/VannModels")
+import Pkg
+Pkg.add("https://github.com/jmgnve/VannModels")
 ````
 
 To load the package, use the command:
@@ -28,7 +29,7 @@ VannModels currently reads data in a specific text format (see examples for [Atn
 First, read the data for one of the example datasets, here Atnasjø:
 
 ````julia
-path = joinpath(pathof(VannModels), "data", "atnasjo")
+path = joinpath(pathof(VannModels), "..", "data", "atnasjo")
 
 date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 ````
@@ -56,13 +57,13 @@ Start by specifying the time step length in hours and the time for the first inp
 ````julia
 tstep = 24.0
 
-time = date[1]
+tstart = date[1]
 ````
 
 Next setup a model object containing necessary data required for running the model:
 
 ````julia
-model = model_hbv_light(tstep, time, frac_lus)
+model = model_hbv_light(tstep, tstart, frac_lus)
 ````
 
 Finally run the model:
@@ -80,17 +81,17 @@ Again, start by specifying the time step length in hours and the time for the fi
 ````julia
 tstep = 24.0
 
-time = date[1]
+tstart = date[1]
 ````
 
 Next specify a snow, glacier and subsurface component:
 
 ````julia
-snow = HbvLightSnow(tstep, time, frac_lus)
+snow = HbvLightSnow(tstep, tstart, frac_lus)
 
 glacier = NoGlacier()
 
-subsurf = Gr4j(tstep, time)
+subsurf = Gr4j(tstep, tstart)
 ````
 
 and create a model object:
