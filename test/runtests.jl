@@ -2,4 +2,6 @@ using VannModels
 using Test
 using Dates
 
-include("solar_rad.jl")
+@testset begin "VannModels" begin
+    include("solar_rad.jl")
+end
