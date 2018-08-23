@@ -30,7 +30,6 @@ First, read the data for one of the example datasets, here Atnasjø:
 
 ````julia
 path = joinpath(pathof(VannModels), "..", "data", "atnasjo")
-
 date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 ````
 
@@ -38,7 +37,6 @@ Second, compute potential evapotranspiration for the catchment:
 
 ````julia
 lat = 60.0
-
 epot = oudin(date, tair, lat, frac_area)
 ````
 
@@ -56,7 +54,6 @@ Start by specifying the time step length in hours and the time for the first inp
 
 ````julia
 tstep = 24.0
-
 tstart = date[1]
 ````
 
@@ -80,7 +77,6 @@ Again, start by specifying the time step length in hours and the time for the fi
 
 ````julia
 tstep = 24.0
-
 tstart = date[1]
 ````
 
@@ -88,9 +84,7 @@ Next specify a snow, glacier and subsurface component:
 
 ````julia
 snow = HbvLightSnow(tstep, tstart, frac_lus)
-
 glacier = NoGlacier()
-
 subsurf = Gr4j(tstep, tstart)
 ````
 
@@ -118,7 +112,6 @@ The model can be ran using the best-fit parameters with the following command:
 
 ````julia
 set_params!(model, param_tuned)
-
 q_sim = run_model(model, input)
 ````
 
