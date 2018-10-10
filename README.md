@@ -105,7 +105,7 @@ q_sim = run_model(model, input)
 A model can be calibrated by running:
 
 ````julia
-param_tuned = run_model_calib(model, input, q_obs, warmup = 1, verbose = :silent)
+param_tuned = run_model_calib(model, input, q_obs, warmup = 1, verbose = :verbose)
 ````
 
 The model can be ran using the best-fit parameters with the following command:
