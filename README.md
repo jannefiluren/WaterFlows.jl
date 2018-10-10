@@ -9,14 +9,14 @@ Other necessary code for hydrological modelling, like input data handling and ev
 
 ## Getting started
 
-To install the package, use the following command inside the Julia REPL:
+This package has been tested on Julia v0.7 (find downloads [here](https://julialang.org/downloads/)).
+
+To install the package, type `]` to enter to the [package manager prompt](https://docs.julialang.org/en/v1/stdlib/Pkg/index.html), and then add the package:
 
 ````julia
-import Pkg
-Pkg.add("https://github.com/jmgnve/VannModels")
+(v0.7) pkg> add https://github.com/jmgnve/VannModels.jl
 ````
-
-To load the package, use the command:
+Leave the package prompt by hitting `backspace`. To load the package, use the command:
 
 ````julia
 using VannModels
