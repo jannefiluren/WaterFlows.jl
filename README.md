@@ -29,7 +29,7 @@ VannModels currently reads data in a specific text format (see examples for [Atn
 First, read the data for one of the example datasets, here Atnasjø:
 
 ````julia
-path = joinpath(pathof(VannModels), "..", "data", "atnasjo")
+path = joinpath(dirname(pathof(VannModels)), "..", "data", "atnasjo")
 date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 ````
 
