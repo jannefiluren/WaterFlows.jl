@@ -146,7 +146,3 @@ The components are combined together to a complete model using [this code](https
 ## Available models
 
 Currently only the HBV light model setup is available as a complete model as described above.
-
-## Finally
-
-This is a naive prototype code that needs much love before becoming good...
