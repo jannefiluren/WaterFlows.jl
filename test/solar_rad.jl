@@ -2,6 +2,7 @@ using VannModels
 using Test
 
 @testset "Solar radiation" begin
+
     date = DateTime(1980, 7, 20)
     doy = Dates.dayofyear(date)
     lat = -23.7951
@@ -24,4 +25,5 @@ using Test
 
     R_so = VannModels.clear_sky_rad(date, lat, elev)
     @test R_so ≈ 17.97157631340434
+
 end
