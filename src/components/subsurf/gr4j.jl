@@ -14,6 +14,7 @@ mutable struct Gr4j <: AbstractSubsurfLumped
     p_in::Float64
     epot::Float64
     q_out::Float64
+    exch::Float64
     tstep::Float64
     time::DateTime
     
@@ -45,8 +46,10 @@ function Gr4j(tstep::Float64, time::DateTime)
     p_in = 0.0
     epot = 0.0
     q_out = 0.0
+    exch = 0.0
     
-    Gr4j(st, st_uh1, st_uh2, ord_uh1, ord_uh2, x1, x2, x3, x4, p_in, epot, q_out, tstep, time)
+    Gr4j(st, st_uh1, st_uh2, ord_uh1, ord_uh2, x1, x2, x3, x4, 
+    p_in, epot, q_out, exch, tstep, time)
     
 end
 
@@ -84,6 +87,15 @@ function init_states!(model::Gr4j, init_time::DateTime)
 end
 
 
+function get_water_stored(model::Gr4j)
+
+    water_stored = sum(model.st) + sum(model.st_uh1) + sum(model.st_uh2)
+
+    return water_stored
+
+end
+
+
 function run_timestep(model::Gr4j)
     
     St     = model.st
@@ -110,7 +122,7 @@ function run_timestep(model::Gr4j)
         end
         TWS = tanh(WS)
         Sr = St[1] / A
-        ER = St[1] * (2.0-Sr)*TWS/(1.0+(1.0-Sr)*TWS)
+        ER = St[1] * (2.0 - Sr) * TWS / (1.0 + (1.0 - Sr) * TWS)
         AE = ER + P1
         St[1] = St[1] - ER
         PR = 0.0
@@ -124,7 +136,7 @@ function run_timestep(model::Gr4j)
         end
         TWS = tanh(WS)
         Sr = St[1] / A
-        PS = A*(1.0-Sr*Sr)*TWS/(1.0+Sr*TWS)
+        PS = A * (1.0 - Sr * Sr) * TWS / (1.0 + Sr * TWS)
         PR = PN - PS
         St[1] = St[1] + PS
     end
@@ -140,7 +152,7 @@ function run_timestep(model::Gr4j)
     Sr = St[1] / model.x1
     Sr = Sr * Sr
     Sr = Sr * Sr
-    PERC = St[1] * (1.0-1.0/sqrt(sqrt(1.0 + Sr/scale_param)))
+    PERC = St[1] * (1.0 - 1.0 / sqrt(sqrt(1.0 + Sr / scale_param)))
     
     St[1] = St[1] - PERC
     
@@ -149,14 +161,14 @@ function run_timestep(model::Gr4j)
     # Split of effective rainfall into the two routing components
     
     PRHU1 = PR * B
-    PRHU2 = PR * (1.0-B)
+    PRHU2 = PR * (1.0 - B)
     
     # Convolution of unit hydrograph UH1
     
     NH = length(OrdUH1)
     
-    for K = 1:NH-1
-        StUH1[K] = StUH1[K+1] + OrdUH1[K]*PRHU1
+    for K = 1:NH - 1
+        StUH1[K] = StUH1[K + 1] + OrdUH1[K] * PRHU1
     end
     
     StUH1[NH] = OrdUH1[NH] * PRHU1
@@ -165,8 +177,8 @@ function run_timestep(model::Gr4j)
     
     NH = length(OrdUH2)
     
-    for K = 1:NH-1
-        StUH2[K] = StUH2[K+1] + OrdUH2[K]*PRHU2
+    for K = 1:NH - 1
+        StUH2[K] = StUH2[K + 1] + OrdUH2[K] * PRHU2
     end
     
     StUH2[NH] = OrdUH2[NH] * PRHU2
@@ -175,14 +187,14 @@ function run_timestep(model::Gr4j)
     
     scale_param = (tstep / 24.0)
     
-    Rr = St[2]/model.x3
-    EXCH = scale_param * model.x2*Rr*Rr*Rr*sqrt(Rr)
+    Rr = St[2] / model.x3
+    EXCH = scale_param * model.x2 * Rr * Rr * Rr * sqrt(Rr)
     
     # Routing store
     
     AEXCH1 = EXCH
     
-    if (St[2]+StUH1[1]+EXCH) < 0.0
+    if (St[2] + StUH1[1] + EXCH) < 0.0
         AEXCH1 = -St[2] - StUH1[1]
     end
     
@@ -195,7 +207,7 @@ function run_timestep(model::Gr4j)
     scale_param = (24.0 / tstep)
     Rr = St[2]^4 / (model.x3^4 * scale_param)
     
-    QR = St[2] * (1.0-1.0/sqrt(sqrt(1.0+Rr)))
+    QR = St[2] * (1.0 - 1.0 / sqrt(sqrt(1.0 + Rr)))
     
     St[2] = St[2] - QR
     
@@ -203,11 +215,11 @@ function run_timestep(model::Gr4j)
     
     AEXCH2 = EXCH
     
-    if (StUH2[1]+EXCH) < 0.0
+    if (StUH2[1] + EXCH) < 0.0
         AEXCH2 = -StUH2[1]
     end
     
-    QD = max(0.0,StUH2[1]+EXCH)
+    QD = max(0.0, StUH2[1] + EXCH)
     
     # Total runoff
     
@@ -224,19 +236,20 @@ function run_timestep(model::Gr4j)
     model.st_uh1  = StUH1
     model.st_uh2  = StUH2
     model.q_out   = Q
+    model.exch    = AEXCH1 + AEXCH2
     
     return nothing
     
 end
 
 
-function SS1(I,C,D)
+function SS1(I, C, D)
     
     FI = I
     if FI <= 0.0
         SS1 = 0.0
     elseif FI < C
-        SS1 = (FI/C)^D
+        SS1 = (FI / C)^D
     else
         SS1 = 1.0
     end
@@ -244,42 +257,42 @@ function SS1(I,C,D)
 end
 
 
-function SS2(I,C,D)
+function SS2(I, C, D)
     
     FI = I
     if FI <= 0.0
         SS2 = 0.0
     elseif FI <= C
-        SS2 = 0.5*(FI/C)^D
-    elseif FI < 2.0*C
-        SS2 = 1.0-0.5*(2.0-FI/C)^D
+        SS2 = 0.5 * (FI / C)^D
+    elseif FI < 2.0 * C
+        SS2 = 1.0 - 0.5 * (2.0 - FI / C)^D
     else
-        SS2=1.0
+        SS2 = 1.0
     end
     
 end
 
 
-function UH1(OrdUH1,C,D)
+function UH1(OrdUH1, C, D)
     
     NH = length(OrdUH1)
     
     for I in 1:NH
         
-        OrdUH1[I] = SS1(I,C,D)-SS1(I-1,C,D)
+        OrdUH1[I] = SS1(I, C, D) - SS1(I - 1, C, D)
         
     end
     
 end
 
 
-function UH2(OrdUH2,C,D)
+function UH2(OrdUH2, C, D)
     
     NH = length(OrdUH2)
     
     for I in 1:NH
         
-        OrdUH2[I] = SS2(I,C,D)-SS2(I-1,C,D)
+        OrdUH2[I] = SS2(I, C, D) - SS2(I - 1, C, D)
         
     end
     
