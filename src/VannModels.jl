@@ -44,7 +44,7 @@ export model_gr4j
 
 export run_timestep, run_model
 export load_data, crop_data
-export get_param_ranges
+export get_param_ranges, get_water_stored
 export epot_zero, hamon, oudin
 export init_states!, set_params!
 export run_model_calib
