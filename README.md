@@ -1,22 +1,16 @@
 # VannModels
 
-Aims of this package: 
+Hydrological models implemented in the Julia programming language. The package currently provides a set of conceptual hydrological models including methods for computing potential evapotranspiration. The models are built using different components and can be combined in different constellations.
 
-- provide a set of (currently simple) hydrological models
-- easy to implement and test new model algorithms
+## Installation
 
-Other necessary code for hydrological modelling, like input data handling and evaluation scripts should not be placed here.
-
-## Getting started
-
-This package has been tested on Julia v0.7 (find downloads [here](https://julialang.org/downloads/)).
-
-To install the package, type `]` to enter to the [package manager prompt](https://docs.julialang.org/en/v1/stdlib/Pkg/index.html), and then add the package:
+The package can be installed with the Julia package manager. From the Julia REPL, type `]` to enter the Pkg REPL mode and run:
 
 ````julia
-(v0.7) pkg> add https://github.com/jmgnve/VannModels.jl
+pkg> add https://github.com/jmgnve/VannModels.jl
 ````
-Leave the package prompt by hitting `backspace`. To load the package, use the command:
+
+And load the package using the command:
 
 ````julia
 using VannModels
@@ -137,11 +131,7 @@ Available subsurface components:
 - HBV light subsurface component (Hbv)
 - GR4J subsurface components (Gr4j)
 
-The components can be combined in any combination. However, note that the input arguments may differ between the components.
-
-For looking at the implementation of the components, click [here](https://github.com/jmgnve/VannModels/tree/master/src/components).
-
-The components are combined together to a complete model using [this code](https://github.com/jmgnve/VannModels/blob/master/src/models/model_components.jl).
+The components can be ordered in any combination. However, note that the input arguments may differ between the components. For looking at the implementation of the components, click [here](https://github.com/jmgnve/VannModels/tree/master/src/components). The components are combined together to a complete model using [this code](https://github.com/jmgnve/VannModels/blob/master/src/models/model_components.jl).
 
 ## Available models
 
