@@ -1,5 +1,9 @@
 # VannModels
 
+| **Build Status**                                                                                |
+|:----------------------------------------------------------------------------------------------- |
+ [![][travis-img]][travis-url] [![][codecov-img]][codecov-url]
+
 Hydrological models implemented in the Julia programming language. The package currently provides a set of conceptual hydrological models including methods for computing potential evapotranspiration. The models are built using different components and can be combined in different constellations.
 
 ## Installation
@@ -136,3 +140,10 @@ The components can be ordered in any combination. However, note that the input a
 ## Available models
 
 Currently only the HBV light model setup is available as a complete model as described above.
+
+
+[travis-img]: https://travis-ci.org/jannefiluren/VannModels.jl.svg?branch=master
+[travis-url]: https://travis-ci.org/jannefiluren/VannModels.jl
+
+[codecov-img]: https://codecov.io/gh/jannefiluren/VannModels.jl/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/jannefiluren/VannModels.jl
