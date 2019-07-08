@@ -1,13 +1,13 @@
 
 
-using VannModels
+using WaterFlows
 using JLD
 
 ############################################################################################
 
 # Load all input data, and select one time period
 
-path = joinpath(Pkg.dir("VannModels"), "data", "fetvatn")
+path = joinpath(Pkg.dir("WaterFlows"), "data", "fetvatn")
 
 date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 

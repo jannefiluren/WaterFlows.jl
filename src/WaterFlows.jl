@@ -1,4 +1,4 @@
-module VannModels
+module WaterFlows
 
 # External packages
 

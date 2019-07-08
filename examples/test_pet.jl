@@ -1,12 +1,12 @@
 
 # Load packages
 
-using VannModels
+using WaterFlows
 using PyPlot
 
 # Input data
 
-path = joinpath(Pkg.dir("VannModels"), "data", "atnasjo")
+path = joinpath(Pkg.dir("WaterFlows"), "data", "atnasjo")
 
 date, tair, prec, q_obs, frac_lus, frac_area = load_data(path)
 

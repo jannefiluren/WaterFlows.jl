@@ -11,23 +11,23 @@ Hydrological models implemented in the Julia programming language. The package c
 The package can be installed with the Julia package manager. From the Julia REPL, type `]` to enter the Pkg REPL mode and run:
 
 ````julia
-pkg> add https://github.com/jmgnve/VannModels.jl
+pkg> add https://github.com/jmgnve/WaterFlows.jl
 ````
 
 And load the package using the command:
 
 ````julia
-using VannModels
+using WaterFlows
 ````
 
 ## Load input data
 
-VannModels currently reads data in a specific text format (see examples for [Atnasjø](https://github.com/jmgnve/VannModels/tree/master/data/atnasjo) and [Fetvatn](https://github.com/jmgnve/VannModels/tree/master/data/fetvatn)). 
+WaterFlows currently reads data in a specific text format (see examples for [Atnasjø](https://github.com/jmgnve/WaterFlows/tree/master/data/atnasjo) and [Fetvatn](https://github.com/jmgnve/WaterFlows/tree/master/data/fetvatn)). 
 
 First, read the data for one of the example datasets, here Atnasjø:
 
 ````julia
-path = joinpath(dirname(pathof(VannModels)), "..", "data", "atnasjo")
+path = joinpath(dirname(pathof(WaterFlows)), "..", "data", "atnasjo")
 date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 ````
 
@@ -135,15 +135,15 @@ Available subsurface components:
 - HBV light subsurface component (Hbv)
 - GR4J subsurface components (Gr4j)
 
-The components can be ordered in any combination. However, note that the input arguments may differ between the components. For looking at the implementation of the components, click [here](https://github.com/jmgnve/VannModels/tree/master/src/components). The components are combined together to a complete model using [this code](https://github.com/jmgnve/VannModels/blob/master/src/models/model_components.jl).
+The components can be ordered in any combination. However, note that the input arguments may differ between the components. For looking at the implementation of the components, click [here](https://github.com/jmgnve/WaterFlows/tree/master/src/components). The components are combined together to a complete model using [this code](https://github.com/jmgnve/WaterFlows/blob/master/src/models/model_components.jl).
 
 ## Available models
 
 Currently only the HBV light model setup is available as a complete model as described above.
 
 
-[travis-img]: https://travis-ci.org/jannefiluren/VannModels.jl.svg?branch=master
-[travis-url]: https://travis-ci.org/jannefiluren/VannModels.jl
+[travis-img]: https://travis-ci.org/jannefiluren/WaterFlows.jl.svg?branch=master
+[travis-url]: https://travis-ci.org/jannefiluren/WaterFlows.jl
 
-[codecov-img]: https://codecov.io/gh/jannefiluren/VannModels.jl/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/jannefiluren/VannModels.jl
+[codecov-img]: https://codecov.io/gh/jannefiluren/WaterFlows.jl/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/jannefiluren/WaterFlows.jl
