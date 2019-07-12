@@ -11,7 +11,7 @@ Hydrological models implemented in the Julia programming language. The package c
 The package can be installed with the Julia package manager. From the Julia REPL, type `]` to enter the Pkg REPL mode and run:
 
 ````julia
-pkg> add https://github.com/jmgnve/WaterFlows.jl
+pkg> add WaterFlows
 ````
 
 And load the package using the command:
