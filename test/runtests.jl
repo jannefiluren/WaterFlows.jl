@@ -4,3 +4,4 @@ using Dates
 
 include("solar_rad.jl")
 include("gr4j.jl")
+include("snow_utils.jl")
