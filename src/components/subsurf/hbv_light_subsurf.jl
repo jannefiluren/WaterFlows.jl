@@ -98,6 +98,15 @@ function init_states!(m::HbvLightSubsurf, init_time::DateTime)
 end
 
 
+function get_water_stored(m::HbvLightSubsurf)
+
+    water_stored = sum(m.sm .* m.frac_lus) + m.suz + m.slz
+
+    return water_stored    
+
+end
+
+
 function run_timestep(m::HbvLightSubsurf)
     
     epot = m.epot
@@ -203,6 +212,7 @@ function run_timestep(m::HbvLightSubsurf)
     # Output runoff
     
     m.q_out = m.st_uh[1]
+    m.st_uh[1] = 0
 
     # Output actual evapotranspiration
 
