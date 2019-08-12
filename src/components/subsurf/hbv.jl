@@ -79,6 +79,15 @@ function init_states!(m::Hbv, init_time::DateTime)
 end
 
 
+function get_water_stored(m::Hbv)
+
+    water_stored = m.sm + m.suz + m.slz + sum(m.st_uh)
+
+    return water_stored
+
+end
+
+
 function run_timestep(m::Hbv)
 
     # Soil moisture zone (assume no evaporation during rainfall)
