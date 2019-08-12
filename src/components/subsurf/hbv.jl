@@ -19,6 +19,7 @@ mutable struct Hbv <: AbstractSubsurfLumped
     p_in::Float64
     epot::Float64
     q_out::Float64
+    aevap::Float64
     tstep::Float64
     time::DateTime
     
