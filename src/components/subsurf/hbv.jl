@@ -39,10 +39,11 @@ function Hbv(tstep::Float64, time::DateTime)
     p_in = 0.0
     epot = 0.0
     q_out = 0.0
+    aevap = 0.0
     
     ord_uh = compute_hbv_ord(maxbas)
     
-    Hbv(sm, suz, slz, st_uh, ord_uh, fc, lp, k0, k1, k2, beta, perc, ulz, maxbas, p_in, epot, q_out, tstep, time)
+    Hbv(sm, suz, slz, st_uh, ord_uh, fc, lp, k0, k1, k2, beta, perc, ulz, maxbas, p_in, epot, q_out, aevap, tstep, time)
     
 end
 
@@ -115,22 +116,22 @@ function run_timestep(m::Hbv)
         
         # No evapotranspiration
         
-        eact = 0.0
+        aevap = 0.0
         
     else
         
         # Compute actual evapotranspiration
         
-        eact = m.epot * min(m.sm/(m.fc*m.lp), 1.0)
+        aevap = m.epot * min(m.sm/(m.fc*m.lp), 1.0)
         
         # Update soil moisture zone
         
-        m.sm = m.sm - eact
+        m.sm = m.sm - aevap
         
         # Check limits for soil moisture zone
         
         if m.sm < 0.0
-            eact = max(eact + m.sm, 0.0)
+            aevap = max(aevap + m.sm, 0.0)
             m.sm = 0.0
         end
         
@@ -186,6 +187,8 @@ function run_timestep(m::Hbv)
     # Compute total runoff
     
     m.q_out = m.st_uh[1]
+
+    m.aevap = aevap
     
     # Update time
     
