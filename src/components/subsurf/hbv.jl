@@ -187,6 +187,9 @@ function run_timestep(m::Hbv)
     # Compute total runoff
     
     m.q_out = m.st_uh[1]
+    m.st_uh[1] = 0
+
+    # Add actual evapotranspiration
 
     m.aevap = aevap
     
