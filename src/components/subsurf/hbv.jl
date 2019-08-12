@@ -67,9 +67,9 @@ function init_states!(m::Hbv, init_time::DateTime)
     
     m.time = init_time
     
-    m.sm      = 0.0
-    m.suz     = 0.0
-    m.slz     = 0.0
+    m.sm      = 0.5*m.fc
+    m.suz     = 0.5*m.ulz
+    m.slz     = 0.5*m.ulz
     
     m.ord_uh = compute_hbv_ord(m.maxbas)
     
