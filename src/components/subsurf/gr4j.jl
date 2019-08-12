@@ -15,6 +15,7 @@ mutable struct Gr4j <: AbstractSubsurfLumped
     epot::Float64
     q_out::Float64
     exch::Float64
+    aevap::Float64
     tstep::Float64
     time::DateTime
     
@@ -47,9 +48,10 @@ function Gr4j(tstep::Float64, time::DateTime)
     epot = 0.0
     q_out = 0.0
     exch = 0.0
+    aevap = 0.0
     
     Gr4j(st, st_uh1, st_uh2, ord_uh1, ord_uh2, x1, x2, x3, x4, 
-    p_in, epot, q_out, exch, tstep, time)
+    p_in, epot, q_out, exch, aevap, tstep, time)
     
 end
 
@@ -237,7 +239,8 @@ function run_timestep(model::Gr4j)
     model.st_uh2  = StUH2
     model.q_out   = Q
     model.exch    = AEXCH1 + AEXCH2
-    
+    model.aevap   = AE
+
     return nothing
     
 end
