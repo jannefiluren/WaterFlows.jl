@@ -69,6 +69,15 @@ function init_states!(m::HbvLightSnow, init_time::DateTime)
 end
 
 
+function get_water_stored(m::HbvLightSnow)
+
+    water_stored = sum((m.swe + m.whc) .* m.frac_lus);
+
+    return water_stored;
+
+end
+
+
 function run_timestep(m::HbvLightSnow)
     
     for ireg in eachindex(m.p_in)

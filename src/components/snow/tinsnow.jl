@@ -28,7 +28,7 @@ function TinSnow(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     
     tth = 0.0
     ddf = 3.69
-    pcorr = 1.02
+    pcorr = 1.00
     
     TinSnow(swe, tth, ddf, pcorr, p_in, tair, q_out, frac_lus, tstep, time)
     
@@ -52,6 +52,15 @@ function init_states!(model::TinSnow, init_time::DateTime)
         model.swe[i] = 0.0
     end
     
+end
+
+
+function get_water_stored(model::TinSnow)
+
+    water_stored = sum(model.swe .* model.frac_lus);
+
+    return water_stored;
+
 end
 
 
