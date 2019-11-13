@@ -122,7 +122,7 @@ function hamon(date::Array{DateTime,1}, tair::Array{Float64,2}, lat::Float64, fr
 
     pet = sum(pet, dims = 1)
 
-    dropsims(pet, dims = 1)
+    dropdims(pet, dims = 1)
 
 end
 
