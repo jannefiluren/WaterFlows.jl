@@ -23,7 +23,7 @@ function HbvLightSnow(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     
     @assert tstep == 24.0 "Time step outside allowed range (24.0h)"
     
-    frac_lus = convert(Array{Float64,2}, frac_lus)
+    frac_lus = Matrix{Float64}(frac_lus)
     frac_lus = transpose(frac_lus)
     
     nlus, nreg = size(frac_lus)

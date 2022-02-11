@@ -7,46 +7,43 @@ function load_data(path, file_q_obs = "runoff.txt", file_tair = "tair.txt",
 
   str   = readline("$path/$file_tair")
   nsep  = length(collect(m.match for m = eachmatch(r";", str)))
-  tmp   = CSV.read("$path/$file_tair", delim = ";", header = false,
-                   dateformat="yyyy-mm-dd HH:MM", allowmissing=:none, types = vcat(DateTime, repeat([Float64], nsep)))
-  tair  = convert(Array, tmp[:, 2:end])
+  tmp   = CSV.File("$path/$file_tair", delim = ";", header = false, dateformat="yyyy-mm-dd HH:MM") |> DataFrame
+  tair  = Matrix{Float64}(tmp[:, 2:end])
   tair  = permutedims(tair)
 
   # Read precipitation data
 
   str   = readline("$path/$file_tair")
   nsep  = length(collect(m.match for m = eachmatch(r";", str)))
-  tmp   = CSV.read("$path/$file_prec", delim = ";", header = false,
-                  dateformat="yyyy-mm-dd HH:MM", allowmissing=:none, types = vcat(DateTime, repeat([Float64], nsep)))
-  prec  = convert(Array, tmp[:, 2:end])
+  tmp   = CSV.File("$path/$file_prec", delim = ";", header = false, dateformat="yyyy-mm-dd HH:MM") |> DataFrame
+  prec  = Matrix{Float64}(tmp[:, 2:end])
   prec  = permutedims(prec)
 
   # Read runoff data
 
-  tmp   = CSV.read("$path/$file_q_obs", delim = ";", header = false,
-                   dateformat="yyyy-mm-dd HH:MM", allowmissing=:none, types = [DateTime, Float64])
-  q_obs = convert(Array, tmp[:, 2])
+  tmp   = CSV.File("$path/$file_q_obs", delim = ";", header = false, dateformat="yyyy-mm-dd HH:MM")  |> DataFrame
+  q_obs = Vector{Float64}(tmp[:, 2])
 
   q_obs[q_obs .< 0.0] .= NaN
 
   # Read metadata
 
-  df_tmp = CSV.read("$path/$file_metadata", delim = ";", header = true)
+  df_tmp = CSV.File("$path/$file_metadata", delim = ";", header = true) |> DataFrame
 
-  area = convert(Array{Float64,1}, df_tmp[:area_sum])
+  area = df_tmp[!, :area_sum]
   frac_area = area / sum(area)
 
-  frac_glacier = convert(Array{Float64,1}, df_tmp[:lus_glacier_mean]) / 100.0
+  frac_glacier = df_tmp[!, :lus_glacier_mean] / 100.0
 
   frac_lus = DataFrame()
-  frac_lus[:glacier] = frac_area .* frac_glacier
-  frac_lus[:open] = frac_area - frac_lus[:glacier]
+  frac_lus[!, :glacier] = frac_area .* frac_glacier
+  frac_lus[!, :open] = frac_area - frac_lus[!, :glacier]
 
-  elev = convert(Array{Float64,1}, df_tmp[:elevation_mean])
+  elev = df_tmp[!, :elevation_mean]
 
   # Get time data
 
-  date = convert(Array, tmp[:, 1])
+  date = Vector(tmp[:, 1])
 
   # Return data
 

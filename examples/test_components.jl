@@ -4,11 +4,11 @@
 using WaterFlows
 using DataFrames
 using PyPlot
-
+using Dates
 
 # Input data
 
-path = joinpath(Pkg.dir("WaterFlows"), "data", "fetvatn")
+path = joinpath(dirname(pathof(WaterFlows)), "..", "data", "atnasjo")
 
 date, tair, prec, q_obs, frac_lus, frac_area, elev = load_data(path)
 

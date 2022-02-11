@@ -76,10 +76,10 @@ end
 """ Get parameter values for a model."""
 function get_params(model::AbstractModel)
     res = []
-    for name_comp in fieldnames(model)
+    for name_comp in fieldnames(typeof(model))
         comp = getfield(model, name_comp)
         param_ranges = get_param_ranges(comp)
-        for name_field in fieldnames(comp)
+        for name_field in fieldnames(typeof(comp))
             if haskey(param_ranges, name_field)
                 append!(res, getfield(comp, name_field))
             end
