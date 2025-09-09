@@ -30,7 +30,7 @@ end
 
 function HbvLightSubsurf(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     
-    frac_lus = convert(Array{Float64,2}, frac_lus)
+    frac_lus = Matrix{Float64}(frac_lus)
     frac_lus = transpose(frac_lus)
 
     nlus, nreg = size(frac_lus)

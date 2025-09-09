@@ -8,7 +8,7 @@ tstep = 24.0
 tstart = DateTime(2017, 1, 1)
 frac_lus = fill(1/4, (2,2))
 
-tinsnow = TinSnow(tstep, tstart, DataFrame(frac_lus))
+tinsnow = TinSnow(tstep, tstart, DataFrame(frac_lus, :auto))
 
 @testset "TinSnow" begin
 
@@ -39,7 +39,7 @@ tinsnow = TinSnow(tstep, tstart, DataFrame(frac_lus))
 end
 
 
-hbvlightsnow = HbvLightSnow(tstep, tstart, DataFrame(frac_lus))
+hbvlightsnow = HbvLightSnow(tstep, tstart, DataFrame(frac_lus, :auto))
 
 @testset "HbvLightSnow" begin
 
@@ -68,9 +68,3 @@ hbvlightsnow = HbvLightSnow(tstep, tstart, DataFrame(frac_lus))
     @test water_start + mean(hbvlightsnow.p_in) ≈ water_end + mean(hbvlightsnow.q_out)
 
 end
-
-
-
-
-
-
