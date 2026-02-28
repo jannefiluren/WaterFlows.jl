@@ -1,7 +1,7 @@
 name = "WaterFlows"
 uuid = "26b386a0-5622-11e9-3ee7-f1bbe84c80da"
-authors = ["Jan Magnusson <jan.magnusson@gmail.com>"]
-version = "0.1.0"
+authors = ["Jan Magnusson <jan.magnusson@slf.ch>"]
+version = "0.1.1"
 
 [deps]
 BlackBoxOptim = "a134a8b2-14d6-55f6-9291-3336d3ab0209"
