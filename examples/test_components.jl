@@ -41,17 +41,21 @@ subsurf = Hbv(tstep, time)
 
 model = ModelComp(snow, glacier, subsurf)
 
+init_states!(model, input.time[1])
+
 q_obs = run_model(model, input)
 
 param_init = get_params(model)
 
-param_tuned = run_model_calib(model, input, q_obs, warmup = 1, verbose = :verbose)
+param_tuned = run_model_calib(model, input, q_obs, warmup = 1, verbose = :verbose, max_steps = 50000)
 
-println(round.(param_init,1))
+println(round.(param_init, digits=1))
 
-println(round.(param_tuned,1))
+println(round.(param_tuned, digits=1))
 
 set_params!(model, param_tuned)
+
+init_states!(model, input.time[1])
 
 q_sim = run_model(model, input)
 

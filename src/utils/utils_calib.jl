@@ -18,13 +18,13 @@ end
 
 """ Run model calibration. """
 function run_model_calib(model::AbstractModel, input::AbstractInput, var_obs;
-                         verbose = :silent, warmup = 3*365)
+                         verbose = :silent, warmup = 3*365, max_steps = 50000)
 
     param_range = get_param_ranges(model)
 
     calib_wrapper_tmp(param) = calib_wrapper(param, model, input, var_obs, warmup)
 
-    res = bboptimize(calib_wrapper_tmp; SearchRange = param_range, TraceMode = verbose,  MaxSteps=5000)
+    res = bboptimize(calib_wrapper_tmp; SearchRange = param_range, TraceMode = verbose,  MaxSteps=max_steps)
 
     best_candidate(res)
 

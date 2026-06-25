@@ -1,7 +1,7 @@
 name = "WaterFlows"
 uuid = "26b386a0-5622-11e9-3ee7-f1bbe84c80da"
-authors = ["Jan Magnusson <jan.magnusson@slf.ch>"]
 version = "0.1.1"
+authors = ["Jan Magnusson <jan.magnusson@slf.ch>"]
 
 [deps]
 BlackBoxOptim = "a134a8b2-14d6-55f6-9291-3336d3ab0209"
@@ -9,14 +9,16 @@ CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
-julia = "1.10"
 BlackBoxOptim = "0.6"
 CSV = "0.10"
 DataFrames = "1"
 Distributions = "0.25"
+PyPlot = "2.11.6"
+julia = "1.10"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
