@@ -1,28 +1,28 @@
 
 mutable struct HbvLightSubsurf <: AbstractSubsurfDist
     
-    sm::Array{Float64,2}
-    suz::Float64
-    slz::Float64
-    st_uh::Array{Float64,1}
-    ord_uh::Array{Float64,1}    
-    perc::Float64
-    k0::Float64
-    k1::Float64
-    k2::Float64
-    uzl::Float64
-    fc::Array{Float64,1}
-    lp::Array{Float64,1}
-    beta::Array{Float64,1}
-    maxbas::Float64
-    snow::Array{Bool,2}
-    p_in::Array{Float64,2}
-    epot::Float64
-    q_out::Float64
-    aevap::Float64
-    frac_lus::Array{Float64,2}
-    tstep::Float64
-    time::DateTime
+    sm::Array{Float64,2}        # Soil storage [mm]
+    suz::Float64                # Storage upper zone [mm]
+    slz::Float64                # Storage lower zone [mm]
+    st_uh::Array{Float64,1}     # Storage unit hydrograph [mm]
+    ord_uh::Array{Float64,1}    # Ordinates of unit hydrograph [-]
+    perc::Float64               # Maximum flow from upper to lower zone [mm d^-1]
+    k0::Float64                 # Recession coefficient upper zone above uzl threshold [d^-1]
+    k1::Float64                 # Recession coefficient upper zone [d^-1]
+    k2::Float64                 # Recession coefficient lower zone [d^-1]
+    uzl::Float64                # Threshold for fast runoff from upper zone [mm]
+    fc::Array{Float64,1}        # Maximum of soil storage [mm]
+    lp::Array{Float64,1}        # Fraction of fc below which evaporation is reduced [-]
+    beta::Array{Float64,1}      # Shape coefficient [-]
+    maxbas::Float64             # Routing, length of weighting function [d]
+    snow::Array{Bool,2}         # Mask indicating presence of snow [-]
+    p_in::Array{Float64,2}      # Input from precipitation and snowmelt [mm d^-1]
+    epot::Float64               # Potential evapotranspiration [mm d^-1]
+    q_out::Float64              # Runoff [mm d^-1]
+    aevap::Float64              # Actual evapotranspiration [mm d^-1]
+    frac_lus::Array{Float64,2}  # Landuse fractions [-]
+    tstep::Float64              # Time step [h]
+    time::DateTime              # Current time [-]
     
 end
 
@@ -74,7 +74,7 @@ function get_param_ranges(m::HbvLightSubsurf)
     :k0 => (0.001, 0.999),
     :k1 => (0.001, 0.999),
     :k2 => (0.001, 0.999),
-    :ulz => (1.0, 1000.0),
+    :uzl => (1.0, 1000.0),
     :fc => (50.0, 500.0),
     :lp => (0.3, 1.0),
     :beta => (1.0, 6.0),
@@ -100,7 +100,7 @@ end
 
 function get_water_stored(m::HbvLightSubsurf)
 
-    water_stored = sum(m.sm .* m.frac_lus) + m.suz + m.slz
+    water_stored = sum(m.sm .* m.frac_lus) + m.suz + m.slz + sum(m.st_uh)
 
     return water_stored    
 
@@ -111,9 +111,10 @@ function run_timestep(m::HbvLightSubsurf)
     
     epot = m.epot
     
-    to_qsum = 0.0
+    sum_to_gw = 0.0
     avg_aet = 0.0
     
+    # Soil routine
     for ireg = 1:size(m.frac_lus, 2)
         
         for ilus = 1:size(m.frac_lus, 1)
@@ -127,30 +128,32 @@ function run_timestep(m::HbvLightSubsurf)
                 
                 insoil = m.p_in[ilus, ireg]
                 
-                to_q = 0.0
+                to_gw = 0.0
                 old_sm = sm
                 
+                # Compute infiltration to soil and recharge to groundwater
                 if insoil > 0.0
                     if insoil < 1.0
-                        y = insoil
+                        insoil_resid = insoil
                     else
-                        mi = floor(insoil)   # IS THIS CORRECT?
-                        y = insoil - mi
-                        for i in 1:mi
-                            dqdp = (sm / fc) ^ beta
-                            if dqdp > 1.0
-                                dqdp = 1.0
+                        # Compute fractions in steps to account for non-linearities
+                        insoil_floored = floor(insoil)
+                        insoil_resid = insoil - insoil_floored
+                        for _ in 1:insoil_floored
+                            frac_to_gw = (sm / fc) ^ beta
+                            if frac_to_gw > 1.0
+                                frac_to_gw = 1.0
                             end
-                            sm = sm + 1.0 - dqdp
-                            to_q = to_q + dqdp
+                            sm = sm + 1.0 - frac_to_gw
+                            to_gw = to_gw + frac_to_gw
                         end
                     end
-                    dqdp = (sm / fc) ^ beta
-                    if dqdp > 1.0
-                        dqdp = 1.0
+                    frac_to_gw = (sm / fc) ^ beta
+                    if frac_to_gw > 1.0
+                        frac_to_gw = 1.0
                     end
-                    sm = sm + (1 - dqdp) * y
-                    to_q = to_q + dqdp * y
+                    sm = sm + (1 - frac_to_gw) * insoil_resid
+                    to_gw = to_gw + frac_to_gw * insoil_resid
                 end
                 
                 mean_sm = (sm + old_sm) / 2.0
@@ -159,7 +162,7 @@ function run_timestep(m::HbvLightSubsurf)
                 else
                     aet = epot
                 end
-                #if snow                       # Currently snow does not influence actual evapotranspiration
+                #if snow        # Currently snow does not influence actual evapotranspiration
                 #    aet = 0.0
                 #end
                 sm = sm - aet
@@ -168,7 +171,7 @@ function run_timestep(m::HbvLightSubsurf)
                 end
                 
                 avg_aet = avg_aet + aet * m.frac_lus[ilus, ireg]
-                to_qsum = to_qsum + to_q * m.frac_lus[ilus, ireg]
+                sum_to_gw = sum_to_gw + to_gw * m.frac_lus[ilus, ireg]
                 m.sm[ilus, ireg] = sm
                 
             end
@@ -177,32 +180,44 @@ function run_timestep(m::HbvLightSubsurf)
         
     end
     
-    to_suz = to_qsum
-    
-    # generation of runoff
-    m.suz = m.suz + to_suz
+    # Add groundwater recharge to upper zone storage
+    m.suz = m.suz + sum_to_gw
+
+    # Handle flow from upper to lower storage zone
     if ( m.suz - m.perc ) < 0.0
+        # Move all upper zone water to lower zone if less than percolation rate
         m.slz = m.slz + m.suz
         m.suz = 0.0
     else
+        # Remove percolation from upper and add to lower zone storage
         m.slz = m.slz + m.perc
         m.suz = m.suz - m.perc
     end
-           
-    q_box1 = m.k1 * m.suz
+    
+    # Compute outflow from upper zone
+    q_suz1 = m.k1 * m.suz
     if m.suz < m.uzl
-        q_box0 = 0.0
+        q_suz0 = 0.0
     else
-        q_box0 = m.k0 * (m.suz - m.uzl)
+        q_suz0 = m.k0 * (m.suz - m.uzl)
     end
     
-    q_box2 = m.k2 * m.slz
-    m.suz = m.suz - q_box1 - q_box0
-    m.slz = m.slz - q_box2
-    q_gen = q_box1 + q_box2 + q_box0
+    # Limit outflow to available water in upper storage zone
+    q_suz = min(q_suz1 + q_suz0, m.suz)
+
+    # Update upper zone storage
+    m.suz = m.suz - q_suz
+
+    # Outflow from lower zone
+    q_slz = m.k2 * m.slz
+
+    # Update lower zone storage
+    m.slz = m.slz - q_slz
+    
+    # Total outflow to unit hydrograph
+    q_gen = q_suz + q_slz
     
     # Convolution of unit hydrograph
-    
     nh = length(m.ord_uh)
     for k = 1:nh-1
         m.st_uh[k] = m.st_uh[k+1] + m.ord_uh[k] * q_gen
@@ -210,20 +225,15 @@ function run_timestep(m::HbvLightSubsurf)
     m.st_uh[nh] = m.ord_uh[nh] * q_gen
     
     # Output runoff
-    
     m.q_out = m.st_uh[1]
     m.st_uh[1] = 0
 
     # Output actual evapotranspiration
-
     m.aevap = avg_aet
 
     # Update time
-
     m.time += Dates.Hour(m.tstep)
     
     return nothing
     
 end    
-
-

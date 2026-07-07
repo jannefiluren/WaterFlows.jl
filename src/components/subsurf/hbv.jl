@@ -2,26 +2,26 @@
 
 mutable struct Hbv <: AbstractSubsurfLumped
     
-    sm::Float64
-    suz::Float64
-    slz::Float64
-    st_uh::Array{Float64,1}
-    ord_uh::Array{Float64,1}
-    fc::Float64
-    lp::Float64
-    k0::Float64
-    k1::Float64
-    k2::Float64
-    beta::Float64
-    perc::Float64
-    ulz::Float64
-    maxbas::Float64
-    p_in::Float64
-    epot::Float64
-    q_out::Float64
-    aevap::Float64
-    tstep::Float64
-    time::DateTime
+    sm::Float64                 # Soil storage [mm]
+    suz::Float64                # Storage upper zone [mm]
+    slz::Float64                # Storage lower zone [mm]
+    st_uh::Array{Float64,1}     # Storage unit hydrograph [mm]
+    ord_uh::Array{Float64,1}    # Ordinates of unit hydrograph [-]
+    fc::Float64                 # Maximum of soil storage [mm]
+    lp::Float64                 # Fraction of fc below which evaporation is reduced [-]
+    k0::Float64                 # Recession coefficient upper zone above ulz threshold [d^-1]
+    k1::Float64                 # Recession coefficient upper zone [d^-1]
+    k2::Float64                 # Recession coefficient lower zone [d^-1]
+    beta::Float64               # Shape coefficient [-]
+    perc::Float64               # Maximum flow from upper to lower zone [mm d^-1]
+    ulz::Float64                # Threshold for fast runoff from upper zone [mm]
+    maxbas::Float64             # Routing, length of weighting function [d]
+    p_in::Float64               # Input from precipitation and snowmelt [mm d^-1]
+    epot::Float64               # Potential evapotranspiration [mm d^-1]
+    q_out::Float64              # Runoff [mm d^-1]
+    aevap::Float64              # Actual evapotranspiration [mm d^-1]
+    tstep::Float64              # Time step [h]
+    time::DateTime              # Current time [-]
     
 end
 
@@ -154,14 +154,9 @@ function run_timestep(m::Hbv)
     
     # Compute runoff from upper groundwater box and update storage
     
-    q_suz = m.k1 * m.suz + m.k0 * max(m.suz-m.ulz, 0.0)
-    
+    q_suz = min(m.k1 * m.suz + m.k0 * max(m.suz-m.ulz, 0.0), m.suz)
+
     m.suz = m.suz - q_suz
-    
-    if m.suz < 0.0
-        q_suz = max(q_suz + m.suz, 0.0)
-        m.suz = 0.0
-    end
     
     # Add precolation to lower groundwater box
     
