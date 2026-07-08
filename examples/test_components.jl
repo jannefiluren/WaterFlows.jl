@@ -3,7 +3,7 @@
 
 using WaterFlows
 using DataFrames
-using PyPlot
+using GLMakie
 using Dates
 
 # Input data
@@ -43,11 +43,11 @@ model = ModelComp(snow, glacier, subsurf)
 
 init_states!(model, input.time[1])
 
-q_obs = run_model(model, input)
+q_ref = run_model(model, input)
 
 param_init = get_params(model)
 
-param_tuned = run_model_calib(model, input, q_obs, warmup = 1, verbose = :verbose, max_steps = 50000)
+param_tuned = run_model_calib(model, input, q_ref, warmup = 1, verbose = :verbose, max_steps = 50000)
 
 println(round.(param_init, digits=1))
 
@@ -59,8 +59,9 @@ init_states!(model, input.time[1])
 
 q_sim = run_model(model, input)
 
-pygui(true)
-
-plot(date, q_sim)
-plot(date, q_obs)
-
+f = Figure()
+ax = Axis(f[1, 1], ylabel="Runoff [mm d^-1]")
+lines!(ax, date, q_ref, label="Reference (synthetic)")
+lines!(ax, date, q_sim, label="Simulated", linestyle=:dash)
+axislegend(ax)
+isinteractive() ? display(f) : wait(display(f))
