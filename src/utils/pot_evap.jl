@@ -8,7 +8,9 @@ element (unitless).
 """
 function oudin(date::Array{DateTime,1}, tair::Array{Float64,2}, lat::Float64, frac_area::Array{Float64,1})
 
-    pet = similar(tair)
+    @assert length(frac_area) == size(tair, 1) "frac_area must have one entry per row of tair"
+
+    pet = zeros(size(tair))
 
     for reg in eachindex(frac_area)
         pet[reg,:] = oudin(date, tair[reg,:] , lat) * frac_area[reg]
@@ -114,7 +116,9 @@ Potential evapotranspiration using Hamons formula (mm/day).
 """
 function hamon(date::Array{DateTime,1}, tair::Array{Float64,2}, lat::Float64, frac_area::Array{Float64,1})
 
-    pet = similar(tair)
+    @assert length(frac_area) == size(tair, 1) "frac_area must have one entry per row of tair"
+
+    pet = zeros(size(tair))
 
     for reg in eachindex(frac_area)
         pet[reg,:] = hamon(date, tair[reg,:] , lat) * frac_area[reg]

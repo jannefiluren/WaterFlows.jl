@@ -5,16 +5,12 @@ function load_data(path, file_q_obs = "runoff.txt", file_tair = "tair.txt",
 
   # Read air temperature data
 
-  str   = readline("$path/$file_tair")
-  nsep  = length(collect(m.match for m = eachmatch(r";", str)))
   tmp   = CSV.File("$path/$file_tair", delim = ";", header = false, dateformat="yyyy-mm-dd HH:MM") |> DataFrame
   tair  = Matrix{Float64}(tmp[:, 2:end])
   tair  = permutedims(tair)
 
   # Read precipitation data
 
-  str   = readline("$path/$file_tair")
-  nsep  = length(collect(m.match for m = eachmatch(r";", str)))
   tmp   = CSV.File("$path/$file_prec", delim = ";", header = false, dateformat="yyyy-mm-dd HH:MM") |> DataFrame
   prec  = Matrix{Float64}(tmp[:, 2:end])
   prec  = permutedims(prec)
