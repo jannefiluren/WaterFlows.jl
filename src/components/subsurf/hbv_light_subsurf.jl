@@ -1,3 +1,7 @@
+# Hydrological component
+#
+# Rate parameters are given in daily units and are rescaled
+# to the model time step internally in run_timestep.
 
 mutable struct HbvLightSubsurf <: AbstractSubsurfDist
     
@@ -29,7 +33,9 @@ end
 
 
 function HbvLightSubsurf(tstep::Float64, time::DateTime, frac_lus::DataFrame)
-    
+
+    @assert (1.0 <= tstep <= 24.0) && isinteger(tstep) "Time step must be a whole number of hours in range 1.0 - 24.0"
+
     frac_lus = Matrix{Float64}(frac_lus)
     frac_lus = transpose(frac_lus)
 
@@ -57,7 +63,7 @@ function HbvLightSubsurf(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     q_out = 0.0
     aevap = 0.0
     
-    ord_uh = compute_hbv_ord(maxbas)
+    ord_uh = compute_hbv_ord(maxbas, tstep)
     st_uh = zero(ord_uh)
     
     HbvLightSubsurf(sm, suz, slz, st_uh, ord_uh, perc, k0, k1, k2, uzl, fc,
@@ -91,10 +97,10 @@ function init_states!(m::HbvLightSubsurf, init_time::DateTime)
     m.suz = 0.0
     m.slz = 0.0
     
-    m.ord_uh = compute_hbv_ord(m.maxbas)
-    
-    m.st_uh .= 0.0
-    
+    m.ord_uh = compute_hbv_ord(m.maxbas, m.tstep)
+
+    m.st_uh = zero(m.ord_uh)
+
 end
 
 
@@ -108,9 +114,16 @@ end
 
 
 function run_timestep(m::HbvLightSubsurf)
-    
+
+    # Scale parameters from daily values to the current time step
+    dt = m.tstep / 24.0
+    k0 = 1.0 - (1.0 - m.k0)^dt
+    k1 = 1.0 - (1.0 - m.k1)^dt
+    k2 = 1.0 - (1.0 - m.k2)^dt
+    perc = m.perc * dt
+
     epot = m.epot
-    
+
     sum_to_gw = 0.0
     avg_aet = 0.0
     
@@ -184,22 +197,22 @@ function run_timestep(m::HbvLightSubsurf)
     m.suz = m.suz + sum_to_gw
 
     # Handle flow from upper to lower storage zone
-    if ( m.suz - m.perc ) < 0.0
+    if ( m.suz - perc ) < 0.0
         # Move all upper zone water to lower zone if less than percolation rate
         m.slz = m.slz + m.suz
         m.suz = 0.0
     else
         # Remove percolation from upper and add to lower zone storage
-        m.slz = m.slz + m.perc
-        m.suz = m.suz - m.perc
+        m.slz = m.slz + perc
+        m.suz = m.suz - perc
     end
-    
+
     # Compute outflow from upper zone
-    q_suz1 = m.k1 * m.suz
+    q_suz1 = k1 * m.suz
     if m.suz < m.uzl
         q_suz0 = 0.0
     else
-        q_suz0 = m.k0 * (m.suz - m.uzl)
+        q_suz0 = k0 * (m.suz - m.uzl)
     end
     
     # Limit outflow to available water in upper storage zone
@@ -209,7 +222,7 @@ function run_timestep(m::HbvLightSubsurf)
     m.suz = m.suz - q_suz
 
     # Outflow from lower zone
-    q_slz = m.k2 * m.slz
+    q_slz = k2 * m.slz
 
     # Update lower zone storage
     m.slz = m.slz - q_slz

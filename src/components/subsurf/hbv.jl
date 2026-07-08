@@ -1,4 +1,7 @@
 # Hydrological component
+#
+# Rate parameters are given in daily units and are rescaled
+# to the model time step internally in run_timestep.
 
 mutable struct Hbv <: AbstractSubsurfLumped
     
@@ -28,21 +31,21 @@ end
 
 function Hbv(tstep::Float64, time::DateTime)
     
-    @assert 1.0 <= tstep <= 24.0 "Time step outside allowed range (1.0 - 24.0h)"
-    
+    @assert (1.0 <= tstep <= 24.0) && isinteger(tstep) "Time step must be a whole number of hours in range 1.0 - 24.0"
+
     sm     = 0.0
     suz    = 0.0
     slz    = 0.0
-    st_uh  = zeros(Float64, 20)
-    
+
     fc, lp, k0, k1, k2, beta, perc, ulz, maxbas = (100.0, 0.8, 0.05, 0.05, 0.01, 1.0, 2.0, 30., 2.5)
-    
+
     p_in = 0.0
     epot = 0.0
     q_out = 0.0
     aevap = 0.0
-    
-    ord_uh = compute_hbv_ord(maxbas)
+
+    ord_uh = compute_hbv_ord(maxbas, tstep)
+    st_uh  = zero(ord_uh)
     
     Hbv(sm, suz, slz, st_uh, ord_uh, fc, lp, k0, k1, k2, beta, perc, ulz, maxbas, p_in, epot, q_out, aevap, tstep, time)
     
@@ -72,12 +75,10 @@ function init_states!(m::Hbv, init_time::DateTime)
     m.suz     = 0.5*m.ulz
     m.slz     = 0.5*m.ulz
     
-    m.ord_uh = compute_hbv_ord(m.maxbas)
-    
-    for i in eachindex(m.st_uh)
-        m.st_uh[i] = 0.0
-    end
-    
+    m.ord_uh = compute_hbv_ord(m.maxbas, m.tstep)
+
+    m.st_uh = zero(m.ord_uh)
+
 end
 
 
@@ -91,6 +92,16 @@ end
 
 
 function run_timestep(m::Hbv)
+
+    # Scale parameters from daily values to the current time step
+
+    dt = m.tstep / 24.0
+
+    k0 = 1.0 - (1.0 - m.k0)^dt
+    k1 = 1.0 - (1.0 - m.k1)^dt
+    k2 = 1.0 - (1.0 - m.k2)^dt
+
+    perc = m.perc * dt
 
     # Soil moisture zone (assume no evaporation during rainfall)
     
@@ -148,13 +159,13 @@ function run_timestep(m::Hbv)
     
     # Remove percolation from upper groundwater box
     
-    perc_now = min(m.perc, m.suz)
+    perc_now = min(perc, m.suz)
     
     m.suz = m.suz - perc_now
     
     # Compute runoff from upper groundwater box and update storage
     
-    q_suz = min(m.k1 * m.suz + m.k0 * max(m.suz-m.ulz, 0.0), m.suz)
+    q_suz = min(k1 * m.suz + k0 * max(m.suz-m.ulz, 0.0), m.suz)
 
     m.suz = m.suz - q_suz
     
@@ -164,7 +175,7 @@ function run_timestep(m::Hbv)
     
     # Compute runoff from lower groundwater box and update storage
     
-    q_slz = m.k2 * m.slz
+    q_slz = k2 * m.slz
     
     m.slz = m.slz - q_slz
     
@@ -198,11 +209,18 @@ function run_timestep(m::Hbv)
 end
 
 
-function compute_hbv_ord(maxbas)
-    
+function compute_hbv_ord(maxbas, tstep = 24.0)
+
+    # Unit hydrograph ordinates from a triangular weighting function
+    # with base length maxbas [d] sampled at the model time step
+
+    dt = tstep / 24.0
+
+    nord = ceil(Int, maxbas / dt)
+
     triang = Distributions.TriangularDist(0, maxbas)
-    triang_cdf = [Distributions.cdf(triang, i) for i in 0:20]
+    triang_cdf = [Distributions.cdf(triang, i * dt) for i in 0:nord]
     ord_uh = diff(triang_cdf)
-    
+
 end
 

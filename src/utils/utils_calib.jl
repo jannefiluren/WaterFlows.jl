@@ -16,18 +16,33 @@ function calib_wrapper(param, model::AbstractModel, input::AbstractInput, var_ob
 end
 
 
-""" Run model calibration. """
+""" Run model calibration. The warmup period is given in days and converted
+to the number of time steps of the model internally. """
 function run_model_calib(model::AbstractModel, input::AbstractInput, var_obs;
                          verbose = :silent, warmup = 3*365, max_steps = 50000)
 
+    warmup_steps = ceil(Int, warmup * 24.0 / get_tstep(model))
+
     param_range = get_param_ranges(model)
 
-    calib_wrapper_tmp(param) = calib_wrapper(param, model, input, var_obs, warmup)
+    calib_wrapper_tmp(param) = calib_wrapper(param, model, input, var_obs, warmup_steps)
 
     res = bboptimize(calib_wrapper_tmp; SearchRange = param_range, TraceMode = verbose,  MaxSteps=max_steps)
 
     best_candidate(res)
 
+end
+
+
+""" Get the model time step in hours. """
+function get_tstep(model::AbstractModel)
+    for name_comp in fieldnames(typeof(model))
+        comp = getfield(model, name_comp)
+        if hasfield(typeof(comp), :tstep)
+            return comp.tstep
+        end
+    end
+    error("No model component with a time step found")
 end
 
 

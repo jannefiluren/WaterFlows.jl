@@ -21,7 +21,7 @@ end
 
 function HbvLightSnow(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     
-    @assert tstep == 24.0 "Time step outside allowed range (24.0h)"
+    @assert (1.0 <= tstep <= 24.0) && isinteger(tstep) "Time step must be a whole number of hours in range 1.0 - 24.0"
     
     frac_lus = Matrix{Float64}(frac_lus)
     frac_lus = transpose(frac_lus)
@@ -79,7 +79,11 @@ end
 
 
 function run_timestep(m::HbvLightSnow)
-    
+
+    # Scale degree-day factor from daily value to the current time step
+
+    dt = m.tstep / 24.0
+
     for ireg in eachindex(m.p_in)
         
         p_in = m.p_in[ireg]
@@ -109,7 +113,7 @@ function run_timestep(m::HbvLightSnow)
                         end
                     end
                     if tair > tt
-                        melt = ddf * (tair - tt)
+                        melt = ddf * dt * (tair - tt)
                         if melt > swe
                             q_out = swe + whc
                             whc = 0.0
@@ -123,7 +127,7 @@ function run_timestep(m::HbvLightSnow)
                             end
                         end
                     else
-                        refrez = pfreeze * ddf * (tt - tair)
+                        refrez = pfreeze * ddf * dt * (tt - tair)
                         if refrez > whc
                             refrez = whc
                         end

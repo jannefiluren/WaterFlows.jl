@@ -17,7 +17,9 @@ end
 
 
 function TinSnow(tstep::Float64, time::DateTime, frac_lus::DataFrame)
-    
+
+    @assert (1.0 <= tstep <= 24.0) && isinteger(tstep) "Time step must be a whole number of hours in range 1.0 - 24.0"
+
     frac_lus = Matrix{Float64}(frac_lus)
     frac_lus = transpose(frac_lus)
     
@@ -65,7 +67,11 @@ end
 
 
 function run_timestep(m::TinSnow)
-    
+
+    # Scale degree-day factor from daily value to the current time step
+
+    dt = m.tstep / 24.0
+
     for ireg in 1:size(m.frac_lus, 2)
         
         # Compute solid and liquid precipitation
@@ -76,7 +82,7 @@ function run_timestep(m::TinSnow)
         
         # Compute potential melt
         
-        melt_pot = pot_melt(m.tair[ireg], m.ddf, m.tth)
+        melt_pot = dt * pot_melt(m.tair[ireg], m.ddf, m.tth)
         
         for ilus in 1:size(m.frac_lus, 1)
             
