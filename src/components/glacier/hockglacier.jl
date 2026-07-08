@@ -20,10 +20,11 @@ function HockGlacier(tstep::Float64, time::DateTime, frac_lus::DataFrame, lat::F
 
     @assert (1.0 <= tstep <= 24.0) && isinteger(tstep) "Time step must be a whole number of hours in range 1.0 - 24.0"
 
-    iglacier = findall(names(frac_lus) .== :glacier)
-    iglacier = iglacier[1]
-    
-    frac_lus = convert(Array{Float64,2}, frac_lus)
+    iglacier = findfirst(==("glacier"), names(frac_lus))
+
+    @assert iglacier !== nothing "frac_lus must contain a column named glacier"
+
+    frac_lus = Matrix{Float64}(frac_lus)
     frac_lus = frac_lus[:, iglacier]
     
     tair  = zeros(Float64, length(frac_lus))
@@ -63,7 +64,7 @@ function run_timestep(g::HockGlacier, s::AbstractSnow)
 
     for reg in eachindex(g.frac_lus)
 
-        if s.swe[g.iglacier, 1] > 0.0
+        if s.swe[g.iglacier, reg] > 0.0
             g.q_out[reg] = 0.0
         elseif g.tair[reg] > 0.0
             R_so = clear_sky_rad(g.time, g.lat, g.elev[reg])

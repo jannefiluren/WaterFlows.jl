@@ -24,7 +24,7 @@ end
 
 function Gr4j(tstep::Float64, time::DateTime)
     
-    @assert 1.0 <= tstep <= 24.0 "Time step outside allowed range (1.0 - 24.0h)"
+    @assert (1.0 <= tstep <= 24.0) && isinteger(tstep) "Time step must be a whole number of hours in range 1.0 - 24.0"
     
     n_ord = ceil(Int64, 20.0 * 24.0 / tstep)
     

@@ -174,6 +174,8 @@ Compute monthly averages.
 """
 function monthly_mean(date, values)
 
+    values = copy(values)
+
     months = map(Dates.month, date)
     
     for month in unique(months)
