@@ -212,15 +212,27 @@ end
 function compute_hbv_ord(maxbas, tstep = 24.0)
 
     # Unit hydrograph ordinates from a triangular weighting function
-    # with base length maxbas [d] sampled at the model time step
+    # with base length maxbas [d] sampled at the model time step.
+    #
+    # The convolution in run_timestep releases ordinate k with a delay of
+    # (k-1)*dt. We therefore sample the triangular CDF at interval midpoints,
+    # so ord_uh[k] carries the mass whose travel time is centred on (k-1)*dt.
+    # This keeps the hydrograph timing consistent across time steps; sampling
+    # at the interval left edges instead advances the response by ~dt/2, which
+    # is negligible at hourly steps but shifts the daily hydrograph by ~half a
+    # day relative to a finer time step.
 
     dt = tstep / 24.0
 
     nord = ceil(Int, maxbas / dt)
 
     triang = Distributions.TriangularDist(0, maxbas)
-    triang_cdf = [Distributions.cdf(triang, i * dt) for i in 0:nord]
+    triang_cdf = [Distributions.cdf(triang, (i - 0.5) * dt) for i in 0:nord]
     ord_uh = diff(triang_cdf)
+
+    ord_uh ./= sum(ord_uh)
+
+    return ord_uh
 
 end
 

@@ -277,26 +277,44 @@ end
 
 
 function UH1(OrdUH1, C, D)
-    
+
+    # The convolution in run_timestep releases ordinate I with a delay of
+    # (I-1) time steps. We therefore sample the S-curve at interval midpoints,
+    # so OrdUH1[I] carries the mass whose travel time is centred on (I-1)*dt.
+    # Sampling at the interval right edge (SS1(I) - SS1(I-1)) instead advances
+    # the response by ~half a step, which is negligible at hourly steps but
+    # shifts the daily hydrograph by ~half a day relative to a finer step.
+    #
+    # NOTE: this makes the routing discretisation time-step consistent, but the
+    # daily and hourly Gr4j runs still differ by design (the UH shape exponent D
+    # varies with the step, and the production/routing stores are nonlinear).
+
     NH = length(OrdUH1)
-    
+
     for I in 1:NH
-        
-        OrdUH1[I] = SS1(I, C, D) - SS1(I - 1, C, D)
-        
+
+        OrdUH1[I] = SS1(I - 0.5, C, D) - SS1(I - 1.5, C, D)
+
     end
-    
+
+    OrdUH1 ./= sum(OrdUH1)
+
 end
 
 
 function UH2(OrdUH2, C, D)
-    
+
+    # Midpoint sampling of the S-curve, matching UH1: OrdUH2[I] holds the mass
+    # routed with delay (I-1) time steps (see the note in UH1).
+
     NH = length(OrdUH2)
-    
+
     for I in 1:NH
-        
-        OrdUH2[I] = SS2(I, C, D) - SS2(I - 1, C, D)
-        
+
+        OrdUH2[I] = SS2(I - 0.5, C, D) - SS2(I - 1.5, C, D)
+
     end
-    
+
+    OrdUH2 ./= sum(OrdUH2)
+
 end
