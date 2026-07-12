@@ -1,6 +1,6 @@
 name = "WaterFlows"
 uuid = "26b386a0-5622-11e9-3ee7-f1bbe84c80da"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Jan Magnusson <jan.magnusson@slf.ch>"]
 
 [deps]
