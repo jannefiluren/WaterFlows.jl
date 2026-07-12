@@ -1,6 +1,18 @@
 # WaterFlows
 
- [![][ci-img]][ci-url] [![][codecov-img]][codecov-url] [![code style: runic](https://img.shields.io/badge/code_style-%E1%9A%B1%E1%9A%A2%E1%9A%BE%E1%9B%81%E1%9A%B2-black)](https://github.com/fredrikekre/Runic.jl) [![DOI](https://zenodo.org/badge/97566223.svg)](https://zenodo.org/badge/latestdoi/97566223)
+[ci-img]: https://github.com/jannefiluren/WaterFlows.jl/actions/workflows/CI.yml/badge.svg?branch=master
+[ci-url]: https://github.com/jannefiluren/WaterFlows.jl/actions/workflows/CI.yml
+
+[codecov-img]: https://codecov.io/gh/jannefiluren/WaterFlows.jl/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/jannefiluren/WaterFlows.jl
+
+[runic-img]: https://img.shields.io/badge/code_style-%E1%9A%B1%E1%9A%A2%E1%9A%BE%E1%9B%81%E1%9A%B2-black
+[runic-url]: https://github.com/fredrikekre/Runic.jl
+
+[zenodo-img]: https://zenodo.org/badge/DOI/10.5281/zenodo.2623743.svg
+[zenodo-url]: https://doi.org/10.5281/zenodo.2623743
+
+ [![][ci-img]][ci-url] [![][codecov-img]][codecov-url] [![code style: runic][runic-img]][runic-url] [![DOI][zenodo-img]][zenodo-url]
 
 Hydrological models implemented in the Julia programming language. The package currently provides a set of conceptual hydrological models including methods for computing potential evapotranspiration. The models are built using different components and can be combined in different constellations.
 
@@ -138,10 +150,3 @@ The components can be ordered in any combination. However, note that the input a
 ## Available models
 
 Currently only the HBV light model setup is available as a complete model as described above.
-
-
-[ci-img]: https://github.com/jannefiluren/WaterFlows.jl/actions/workflows/CI.yml/badge.svg?branch=master
-[ci-url]: https://github.com/jannefiluren/WaterFlows.jl/actions/workflows/CI.yml
-
-[codecov-img]: https://codecov.io/gh/jannefiluren/WaterFlows.jl/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/jannefiluren/WaterFlows.jl
