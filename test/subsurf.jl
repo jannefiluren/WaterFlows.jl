@@ -43,9 +43,9 @@ hbv.p_in = 10
     init_states!(hbv, tstart)
 
     water_start = get_water_stored(hbv)
-    
+
     run_timestep(hbv)
-    
+
     water_end = get_water_stored(hbv)
 
     @test water_start + hbv.p_in ≈ water_end + hbv.q_out + hbv.aevap
@@ -65,9 +65,9 @@ hbv_light.p_in .= 10
     init_states!(hbv_light, tstart)
 
     water_start = get_water_stored(hbv_light)
-    
+
     run_timestep(hbv_light)
-    
+
     water_end = get_water_stored(hbv_light)
 
     @test water_start + mean(hbv_light.p_in) ≈ water_end + hbv_light.q_out + hbv_light.aevap atol = 0.0001

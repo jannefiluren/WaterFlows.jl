@@ -2,11 +2,11 @@
 
 mutable struct NoSnow <: AbstractSnow
 
-    swe::Array{Float64,2}
-    p_in::Array{Float64,1}
-    tair::Array{Float64,1}
-    q_out::Array{Float64,2}
-    frac_lus::Array{Float64,2}
+    swe::Array{Float64, 2}
+    p_in::Array{Float64, 1}
+    tair::Array{Float64, 1}
+    q_out::Array{Float64, 2}
+    frac_lus::Array{Float64, 2}
     tstep::Float64
     time::DateTime
 
@@ -20,19 +20,19 @@ function NoSnow(tstep::Float64, time::DateTime, frac_lus::DataFrame)
     frac_lus = Matrix{Float64}(frac_lus)
     frac_lus = transpose(frac_lus)
 
-    swe   = zeros(Float64, size(frac_lus))
-    p_in  = zeros(Float64, size(frac_lus, 2))
-    tair  = zeros(Float64, size(frac_lus, 2))
+    swe = zeros(Float64, size(frac_lus))
+    p_in = zeros(Float64, size(frac_lus, 2))
+    tair = zeros(Float64, size(frac_lus, 2))
     q_out = zeros(Float64, size(frac_lus))
 
-    NoSnow(swe, p_in, tair, q_out, frac_lus, tstep, time)
+    return NoSnow(swe, p_in, tair, q_out, frac_lus, tstep, time)
 
 end
 
 
 function get_param_ranges(model::NoSnow)
 
-    param_range = Dict()
+    return param_range = Dict()
 
 end
 

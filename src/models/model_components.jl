@@ -1,13 +1,11 @@
-
-
 # Semidistributed model with snow and hydrological component
 
 mutable struct ModelComp{sn <: AbstractSnow, gl <: AbstractGlacier, ss <: AbstractSubsurf} <: AbstractModel
-    
+
     snow::sn
     glacier::gl
     subsurf::ss
-    
+
 end
 
 function run_model(model::ModelComp, input::InputPTE)
@@ -55,7 +53,9 @@ end
         sn.tair[reg] = input.tair[reg, t]
         sn.p_in[reg] = input.prec[reg, t]
     end
-    
+
+    return nothing
+
 end
 
 
@@ -66,7 +66,9 @@ end
     for reg in eachindex(gl.frac_lus)
         gl.tair[reg] = input.tair[reg, t]
     end
-    
+
+    return nothing
+
 end
 
 
@@ -82,17 +84,19 @@ end
 @inline function set_input(ss::AbstractSubsurfLumped, sn::AbstractSnow, gl::AbstractGlacier, input::InputPTE, t::Int64)
 
     ss.epot = input.epot[t]
-    
+
     ss.p_in = 0.0
 
     for reg in eachindex(sn.frac_lus)
         ss.p_in += sn.frac_lus[reg] * sn.q_out[reg]
     end
-    
+
     for reg in eachindex(gl.frac_lus)
         ss.p_in += gl.frac_lus[reg] * gl.q_out[reg]
     end
-    
+
+    return nothing
+
 end
 
 
@@ -101,13 +105,15 @@ end
 @inline function set_input(ss::AbstractSubsurfLumped, sn::AbstractSnow, gl::NoGlacier, input::InputPTE, t::Int64)
 
     ss.epot = input.epot[t]
-    
+
     ss.p_in = 0.0
 
     for reg in eachindex(sn.frac_lus)
         ss.p_in += sn.frac_lus[reg] * sn.q_out[reg]
     end
-    
+
+    return nothing
+
 end
 
 
@@ -116,7 +122,7 @@ end
 @inline function set_input(ss::AbstractSubsurfDist, sn::AbstractSnow, gl::AbstractGlacier, input::InputPTE, t::Int64)
 
     ss.epot = input.epot[t]
-    
+
     for i in eachindex(ss.p_in)
         ss.p_in[i] = sn.q_out[i]
         ss.snow[i] = sn.swe[i] > 0.0
@@ -134,7 +140,7 @@ end
 # Set input to distributed subsurface model without glacier
 
 @inline function set_input(ss::AbstractSubsurfDist, sn::AbstractSnow, gl::NoGlacier, input::InputPTE, t::Int64)
-    
+
     ss.epot = input.epot[t]
 
     for i in eachindex(ss.p_in)
@@ -145,4 +151,3 @@ end
     return nothing
 
 end
-

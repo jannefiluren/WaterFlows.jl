@@ -1,14 +1,14 @@
 # Glacier component
 
 mutable struct NoGlacier <: AbstractGlacier
-    
+
     #= tair::Array{Float64,1}
     q_out::Array{Float64,1}
     frac_lus::Array{Float64,1}
     iglacier::Int64
     tstep::Float64
     time::DateTime =#
-    
+
 end
 
 
@@ -29,9 +29,9 @@ end =#
 
 
 function get_param_ranges(model::NoGlacier)
-    
-    param_range = Dict()
-    
+
+    return param_range = Dict()
+
 end
 
 

@@ -7,8 +7,8 @@ using Dates
 
 # Construct a subsurface component (constructors differ in their arguments)
 
-setup_subsurf(::Type{Gr4j},            tstep, time, frac_lus) = Gr4j(tstep, time)
-setup_subsurf(::Type{Hbv},             tstep, time, frac_lus) = Hbv(tstep, time)
+setup_subsurf(::Type{Gr4j}, tstep, time, frac_lus) = Gr4j(tstep, time)
+setup_subsurf(::Type{Hbv}, tstep, time, frac_lus) = Hbv(tstep, time)
 setup_subsurf(::Type{HbvLightSubsurf}, tstep, time, frac_lus) = HbvLightSubsurf(tstep, time, frac_lus)
 
 # Helper function
@@ -45,7 +45,7 @@ function run_example(input_daily, input_hourly, frac_lus, snow_model, subsurf_mo
 
     # Plot results
 
-    q_hourly_daily = [sum(@view q_hourly[(i-1)*24+1 : i*24]) for i in eachindex(input_daily.time)]
+    q_hourly_daily = [sum(@view q_hourly[((i - 1) * 24 + 1):(i * 24)]) for i in eachindex(input_daily.time)]
 
     fig = Figure()
     ax = Axis(fig[1, 1], title = "$(snow_model) + $(subsurf_model)", ylabel = "Runoff [mm/day]")
@@ -72,11 +72,11 @@ input_daily = InputPTE(time_daily, prec_daily, tair_daily, epot_daily)
 
 time_hourly = [time_daily[j] + Hour(i) for i in 0:23, j in eachindex(time_daily)][:]
 
-time_hourly = DateTime(first(time_daily)):Hour(1):DateTime(last(time_daily)) + Hour(23)
-tair_hourly = repeat(tair_daily, inner=(1, 24))
-prec_hourly = repeat(prec_daily, inner=(1, 24)) / 24
+time_hourly = DateTime(first(time_daily)):Hour(1):(DateTime(last(time_daily)) + Hour(23))
+tair_hourly = repeat(tair_daily, inner = (1, 24))
+prec_hourly = repeat(prec_daily, inner = (1, 24)) / 24
 
-epot_hourly = repeat(epot_daily, inner=24) / 24
+epot_hourly = repeat(epot_daily, inner = 24) / 24
 
 input_hourly = InputPTE(time_hourly, prec_hourly, tair_hourly, epot_hourly)
 

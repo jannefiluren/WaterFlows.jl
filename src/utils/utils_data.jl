@@ -1,49 +1,51 @@
 # Load operational data from text files
 
-function load_data(path, file_q_obs = "runoff.txt", file_tair = "tair.txt",
-                   file_prec = "prec.txt", file_metadata = "metadata.txt")
+function load_data(
+        path, file_q_obs = "runoff.txt", file_tair = "tair.txt",
+        file_prec = "prec.txt", file_metadata = "metadata.txt"
+    )
 
-  # Read air temperature data
+    # Read air temperature data
 
-  tmp   = CSV.File("$path/$file_tair", delim = ";", header = false, dateformat="yyyy-mm-dd HH:MM") |> DataFrame
-  tair  = Matrix{Float64}(tmp[:, 2:end])
-  tair  = permutedims(tair)
+    tmp = CSV.File("$path/$file_tair", delim = ";", header = false, dateformat = "yyyy-mm-dd HH:MM") |> DataFrame
+    tair = Matrix{Float64}(tmp[:, 2:end])
+    tair = permutedims(tair)
 
-  # Read precipitation data
+    # Read precipitation data
 
-  tmp   = CSV.File("$path/$file_prec", delim = ";", header = false, dateformat="yyyy-mm-dd HH:MM") |> DataFrame
-  prec  = Matrix{Float64}(tmp[:, 2:end])
-  prec  = permutedims(prec)
+    tmp = CSV.File("$path/$file_prec", delim = ";", header = false, dateformat = "yyyy-mm-dd HH:MM") |> DataFrame
+    prec = Matrix{Float64}(tmp[:, 2:end])
+    prec = permutedims(prec)
 
-  # Read runoff data
+    # Read runoff data
 
-  tmp   = CSV.File("$path/$file_q_obs", delim = ";", header = false, dateformat="yyyy-mm-dd HH:MM")  |> DataFrame
-  q_obs = Vector{Float64}(tmp[:, 2])
+    tmp = CSV.File("$path/$file_q_obs", delim = ";", header = false, dateformat = "yyyy-mm-dd HH:MM") |> DataFrame
+    q_obs = Vector{Float64}(tmp[:, 2])
 
-  q_obs[q_obs .< 0.0] .= NaN
+    q_obs[q_obs .< 0.0] .= NaN
 
-  # Read metadata
+    # Read metadata
 
-  df_tmp = CSV.File("$path/$file_metadata", delim = ";", header = true) |> DataFrame
+    df_tmp = CSV.File("$path/$file_metadata", delim = ";", header = true) |> DataFrame
 
-  area = df_tmp[!, :area_sum]
-  frac_area = area / sum(area)
+    area = df_tmp[!, :area_sum]
+    frac_area = area / sum(area)
 
-  frac_glacier = df_tmp[!, :lus_glacier_mean] / 100.0
+    frac_glacier = df_tmp[!, :lus_glacier_mean] / 100.0
 
-  frac_lus = DataFrame()
-  frac_lus[!, :glacier] = frac_area .* frac_glacier
-  frac_lus[!, :open] = frac_area - frac_lus[!, :glacier]
+    frac_lus = DataFrame()
+    frac_lus[!, :glacier] = frac_area .* frac_glacier
+    frac_lus[!, :open] = frac_area - frac_lus[!, :glacier]
 
-  elev = df_tmp[!, :elevation_mean]
+    elev = df_tmp[!, :elevation_mean]
 
-  # Get time data
+    # Get time data
 
-  date = Vector(tmp[:, 1])
+    date = Vector(tmp[:, 1])
 
-  # Return data
+    # Return data
 
-  return date, tair, prec, q_obs, frac_lus, frac_area, elev
+    return date, tair, prec, q_obs, frac_lus, frac_area, elev
 
 end
 
@@ -52,25 +54,25 @@ end
 
 function crop_data(date, tair, prec, q_obs, date_start, date_stop)
 
-  # Find indicies
+    # Find indicies
 
-  istart = findall(date .== date_start)
-  istop = findall(date .== date_stop)
+    istart = findall(date .== date_start)
+    istop = findall(date .== date_stop)
 
-  # Test if ranges are valid
+    # Test if ranges are valid
 
-  if isempty(istart) | isempty(istop)
-    error("Cropping data outside range")
-  end
+    if isempty(istart) | isempty(istop)
+        error("Cropping data outside range")
+    end
 
-  # Crop data
+    # Crop data
 
-  date  = date[istart[1]:istop[1]]
-  tair  = tair[:, istart[1]:istop[1]]
-  prec  = prec[:, istart[1]:istop[1]]
-  q_obs = q_obs[istart[1]:istop[1]]
+    date = date[istart[1]:istop[1]]
+    tair = tair[:, istart[1]:istop[1]]
+    prec = prec[:, istart[1]:istop[1]]
+    q_obs = q_obs[istart[1]:istop[1]]
 
-  return date, tair, prec, q_obs
+    return date, tair, prec, q_obs
 
 end
 
@@ -79,24 +81,23 @@ end
 
 function crop_data(date, tair, prec, q_obs, date_start)
 
-  # Find indicies
+    # Find indicies
 
-  istart = findall(date .== date_start)
+    istart = findall(date .== date_start)
 
-  # Test if ranges are valid
+    # Test if ranges are valid
 
-  if isempty(istart)
-    error("Cropping data outside range")
-  end
+    if isempty(istart)
+        error("Cropping data outside range")
+    end
 
-  # Crop data
+    # Crop data
 
-  date  = date[istart[1]:end]
-  tair  = tair[:, istart[1]:end]
-  prec  = prec[:, istart[1]:end]
-  q_obs = q_obs[istart[1]:end]
+    date = date[istart[1]:end]
+    tair = tair[:, istart[1]:end]
+    prec = prec[:, istart[1]:end]
+    q_obs = q_obs[istart[1]:end]
 
-  return date, tair, prec, q_obs
+    return date, tair, prec, q_obs
 
 end
-
