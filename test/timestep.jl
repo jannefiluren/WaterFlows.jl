@@ -119,7 +119,7 @@ end
 
 @testset "TinSnow melt equivalence" begin
 
-    frac_lus = DataFrame(fill(0.25, (2,2)), :auto)
+    frac_lus = DataFrame(fill(0.25, (2, 2)), :auto)
 
     tin_daily = TinSnow(24.0, tstart, frac_lus)
     tin_hourly = TinSnow(1.0, tstart, frac_lus)
@@ -152,7 +152,7 @@ end
 
 @testset "HbvLightSnow melt equivalence" begin
 
-    frac_lus = DataFrame(fill(0.25, (2,2)), :auto)
+    frac_lus = DataFrame(fill(0.25, (2, 2)), :auto)
 
     snow_daily = HbvLightSnow(24.0, tstart, frac_lus)
     snow_hourly = HbvLightSnow(1.0, tstart, frac_lus)

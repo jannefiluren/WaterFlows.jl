@@ -1,4 +1,3 @@
-
 # Load packages
 
 using WaterFlows
@@ -17,8 +16,8 @@ pet_oudin = oudin(date, tair, lat, frac_area)
 pet_hamon = hamon(date, tair, lat, frac_area)
 
 f = Figure()
-ax = Axis(f[1, 1], ylabel="Potential evapotranspiration [mm d^-1]")
-lines!(ax, date, pet_oudin, label="Oudin")
-lines!(ax, date, pet_hamon, label="Hamon")
+ax = Axis(f[1, 1], ylabel = "Potential evapotranspiration [mm d^-1]")
+lines!(ax, date, pet_oudin, label = "Oudin")
+lines!(ax, date, pet_hamon, label = "Hamon")
 axislegend(ax)
 isinteractive() ? display(f) : wait(display(f))

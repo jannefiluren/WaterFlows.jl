@@ -1,5 +1,3 @@
-
-
 """ Single model run for calibration. """
 function calib_wrapper(param, model::AbstractModel, input::AbstractInput, var_obs, warmup)
 
@@ -11,15 +9,17 @@ function calib_wrapper(param, model::AbstractModel, input::AbstractInput, var_ob
 
     var_sim = run_model(model, input)
 
-    1.0 - nse(var_sim[warmup:end], var_obs[warmup:end])
+    return 1.0 - nse(var_sim[warmup:end], var_obs[warmup:end])
 
 end
 
 
 """ Run model calibration. The warmup period is given in days and converted
 to the number of time steps of the model internally. """
-function run_model_calib(model::AbstractModel, input::AbstractInput, var_obs;
-                         verbose = :silent, warmup = 3*365, max_steps = 50000)
+function run_model_calib(
+        model::AbstractModel, input::AbstractInput, var_obs;
+        verbose = :silent, warmup = 3 * 365, max_steps = 50000
+    )
 
     warmup_steps = ceil(Int, warmup * 24.0 / get_tstep(model))
 
@@ -27,9 +27,9 @@ function run_model_calib(model::AbstractModel, input::AbstractInput, var_obs;
 
     calib_wrapper_tmp(param) = calib_wrapper(param, model, input, var_obs, warmup_steps)
 
-    res = bboptimize(calib_wrapper_tmp; SearchRange = param_range, TraceMode = verbose,  MaxSteps=max_steps)
+    res = bboptimize(calib_wrapper_tmp; SearchRange = param_range, TraceMode = verbose, MaxSteps = max_steps)
 
-    best_candidate(res)
+    return best_candidate(res)
 
 end
 
@@ -50,18 +50,18 @@ end
 function nse(var_sim, var_obs)
 
     ikeep = .!isnan.(var_obs)
-    
+
     var_sim = var_sim[ikeep]
     var_obs = var_obs[ikeep]
-    
-    1.0 .- sum((var_sim .- var_obs).^2) / sum((var_obs .- mean(var_obs)).^2)
+
+    return 1.0 .- sum((var_sim .- var_obs) .^ 2) / sum((var_obs .- mean(var_obs)) .^ 2)
 
 end
 
 
 """ Compute Kling-Gupta efficiency. """
 function kge(var_sim, var_obs)
-    
+
     if all(isnan, var_sim) || all(isnan, var_obs)
 
         kge = NaN
@@ -79,7 +79,7 @@ function kge(var_sim, var_obs)
 
         gamma = (std(var_sim) / mean(var_sim)) / (std(var_obs) / mean(var_obs))
 
-        kge = 1 - sqrt( (r-1)^2 + (beta-1)^2 + (gamma-1)^2 )
+        kge = 1 - sqrt((r - 1)^2 + (beta - 1)^2 + (gamma - 1)^2)
 
     end
 
@@ -119,26 +119,26 @@ function get_param_ranges(model::AbstractModel)
             end
         end
     end
-    res = convert(Array{Tuple{Float64,Float64},1}, res)
+    res = convert(Array{Tuple{Float64, Float64}, 1}, res)
     return res
 end
 
 
 """Set parameters of a model."""
 function set_params!(model::AbstractModel, param_input)
-    
-    # Check number of parameters    
+
+    # Check number of parameters
     param_ranges = get_param_ranges(model)
     err_msg = "Model requires ($(length(param_ranges)) input parameters"
-    @assert length(param_ranges) == length(param_input) 
-    
+    @assert length(param_ranges) == length(param_input)
+
     # Check parameter ranges
     for i in eachindex(param_input)
         param_min, param_max = param_ranges[i]
         err_msg = "Parameter number $i outside of allowed range $(param_ranges[i])"
         @assert param_min <= param_input[i] <= param_max err_msg
     end
-    
+
     # Set parameter values
     iparam = 1
     for name_comp in fieldnames(typeof(model))
@@ -177,8 +177,7 @@ function init_states!(model::AbstractModel, init_time::DateTime)
         setfield!(model, name_comp, comp)
 
     end
-    
+
     return nothing
 
 end
-

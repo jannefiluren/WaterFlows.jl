@@ -1,8 +1,6 @@
 # WaterFlows
 
-| **Build Status**                                                                                |
-|:----------------------------------------------------------------------------------------------- |
- [![][travis-img]][travis-url] [![][codecov-img]][codecov-url]
+ [![][ci-img]][ci-url] [![][codecov-img]][codecov-url] [![code style: runic](https://img.shields.io/badge/code_style-%E1%9A%B1%E1%9A%A2%E1%9A%BE%E1%9B%81%E1%9A%B2-black)](https://github.com/fredrikekre/Runic.jl)
 
 Hydrological models implemented in the Julia programming language. The package currently provides a set of conceptual hydrological models including methods for computing potential evapotranspiration. The models are built using different components and can be combined in different constellations.
 
@@ -142,8 +140,8 @@ The components can be ordered in any combination. However, note that the input a
 Currently only the HBV light model setup is available as a complete model as described above.
 
 
-[travis-img]: https://travis-ci.org/jannefiluren/WaterFlows.jl.svg?branch=master
-[travis-url]: https://travis-ci.org/jannefiluren/WaterFlows.jl
+[ci-img]: https://github.com/jannefiluren/WaterFlows.jl/actions/workflows/CI.yml/badge.svg?branch=master
+[ci-url]: https://github.com/jannefiluren/WaterFlows.jl/actions/workflows/CI.yml
 
 [codecov-img]: https://codecov.io/gh/jannefiluren/WaterFlows.jl/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/jannefiluren/WaterFlows.jl

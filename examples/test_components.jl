@@ -1,4 +1,3 @@
-
 # Load packages
 
 using WaterFlows
@@ -49,9 +48,9 @@ param_init = get_params(model)
 
 param_tuned = run_model_calib(model, input, q_ref, warmup = 1, verbose = :verbose, max_steps = 50000)
 
-println(round.(param_init, digits=1))
+println(round.(param_init, digits = 1))
 
-println(round.(param_tuned, digits=1))
+println(round.(param_tuned, digits = 1))
 
 set_params!(model, param_tuned)
 
@@ -60,8 +59,8 @@ init_states!(model, input.time[1])
 q_sim = run_model(model, input)
 
 f = Figure()
-ax = Axis(f[1, 1], ylabel="Runoff [mm d^-1]")
-lines!(ax, date, q_ref, label="Reference (synthetic)")
-lines!(ax, date, q_sim, label="Simulated", linestyle=:dash)
+ax = Axis(f[1, 1], ylabel = "Runoff [mm d^-1]")
+lines!(ax, date, q_ref, label = "Reference (synthetic)")
+lines!(ax, date, q_sim, label = "Simulated", linestyle = :dash)
 axislegend(ax)
 isinteractive() ? display(f) : wait(display(f))
